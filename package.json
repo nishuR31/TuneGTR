@@ -1,0 +1,15 @@
+{
+  "name": "guitar-tool-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Guitar Tuner Monorepo",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "bun run start --workspace=mobile",
+    "start": "bun run start --workspace=mobile",
+    "test": "bun run test --workspaces"
+  }
+}
