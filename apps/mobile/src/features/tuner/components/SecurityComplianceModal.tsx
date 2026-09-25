@@ -82,7 +82,7 @@ export const SecurityComplianceModal: React.FC<SecurityComplianceModalProps> = (
             </View>
             
             {/* Disclaimer */}
-            <AppSurface level="raised" className="p-4 rounded-xl mt-2 mb-8 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+            <AppSurface level="raised" className="p-4 rounded-xl mt-2 mb-8">
               <AppText variant="caption" color="muted" className="text-center leading-5">
                 By using this app, you agree to grant local-only microphone access purely for tuning purposes. Standard OS permissions apply.
               </AppText>

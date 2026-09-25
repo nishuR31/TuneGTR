@@ -8,6 +8,9 @@ import { AppSurface } from '../components/common/AppSurface';
 import { AppText } from '../components/common/AppText';
 import { toast } from 'sonner-native';
 import Feather from '@expo/vector-icons/Feather';
+import { SecurityComplianceModal } from '../features/tuner/components/SecurityComplianceModal';
+import RNRestart from 'react-native-restart';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const CAPO_FRETS = Array.from({ length: 13 }, (_, i) => i); // 0-12
 
@@ -16,11 +19,12 @@ export function SettingsScreen() {
   const { clearPitchData, referenceA4, setReferenceA4, capoFret, setCapoFret } = useTunerStore();
   const theme = useTheme();
   const insets = useSafeAreaInsets();
+  const [showSecurityModal, setShowSecurityModal] = useState(false);
   
   return (
     <ScrollView 
       style={[styles.container, { backgroundColor: theme.colors.background }]}
-      contentContainerStyle={{ paddingTop: insets.top, paddingBottom: insets.bottom + 32 }}
+      contentContainerStyle={{ paddingTop: insets.top, paddingBottom: insets.bottom + 110 }}
       showsVerticalScrollIndicator={false}
     >
       {/* Title */}
@@ -163,19 +167,39 @@ export function SettingsScreen() {
         </View>
       </AppSurface>
 
+      {/* ─── Privacy & Security Section ─── */}
+      <AppText variant="caption" color="muted" style={[styles.sectionLabel, { paddingHorizontal: theme.spacing.lg, marginTop: theme.spacing.xl, marginBottom: theme.spacing.xs }]}>
+        PRIVACY & SECURITY
+      </AppText>
+      <AppSurface isCard level="elevated" style={[styles.card, { padding: theme.spacing.md, marginHorizontal: theme.spacing.lg }]}>
+        <TouchableOpacity style={[styles.row, { paddingVertical: theme.spacing.sm }]} onPress={() => setShowSecurityModal(true)}>
+          <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
+            <Feather name="shield" size={18} color={theme.colors.text} style={{ marginRight: theme.spacing.sm }} />
+            <View>
+              <AppText variant="body" style={{ fontWeight: '500' }}>Security & Privacy</AppText>
+              <AppText variant="caption" color="muted" style={{ marginTop: 2 }}>
+                View our privacy compliance and policies.
+              </AppText>
+            </View>
+          </View>
+          <Feather name="chevron-right" size={20} color={theme.colors.textMuted} />
+        </TouchableOpacity>
+      </AppSurface>
+
       {/* ─── Advanced Section ─── */}
       <AppText variant="caption" color="muted" style={[styles.sectionLabel, { paddingHorizontal: theme.spacing.lg, marginTop: theme.spacing.xl, marginBottom: theme.spacing.xs }]}>
         ADVANCED
       </AppText>
       <AppSurface isCard level="base" style={[styles.card, { padding: theme.spacing.md, marginHorizontal: theme.spacing.lg }]}>
-        <TouchableOpacity style={[styles.button, { paddingVertical: theme.spacing.sm, flexDirection: 'row', justifyContent: 'center' }]} onPress={() => {
+        <TouchableOpacity style={[styles.button, { paddingVertical: theme.spacing.sm, flexDirection: 'row', justifyContent: 'center' }]} onPress={async () => {
             clearPitchData();
             toast.success("Cache Cleared, Reloading...");
+            await AsyncStorage.clear();
             setTimeout(() => {
               if (Platform.OS === 'web') {
                 window.location.reload();
-              } else if (NativeModules.DevSettings) {
-                NativeModules.DevSettings.reload();
+              } else {
+                RNRestart.Restart();
               }
             }, 1000);
         }}>
@@ -188,6 +212,11 @@ export function SettingsScreen() {
       <AppText variant="caption" color="muted" style={{ textAlign: 'center', marginTop: theme.spacing.xl }}>
         Guitar Tuner v0.1.0
       </AppText>
+
+      <SecurityComplianceModal 
+        visible={showSecurityModal} 
+        onClose={() => setShowSecurityModal(false)} 
+      />
     </ScrollView>
   );
 }

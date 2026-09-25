@@ -134,7 +134,7 @@ export function TunerScreen() {
           className="flex-1"
           style={{ 
             justifyContent: layout.isLandscape ? 'center' : 'flex-end',
-            paddingBottom: layout.isLandscape ? 0 : layout.insets.bottom + 16,
+            paddingBottom: layout.isLandscape ? 0 : layout.insets.bottom + 110,
             paddingTop: layout.isLandscape ? layout.insets.top + 24 : 0,
           }}
         >

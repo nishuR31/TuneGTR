@@ -33,7 +33,7 @@ export const TunerStateBanner: React.FC = () => {
         if (clampedCents < -20) {
           return { 
             label: "Flat", 
-            direction: "↑ TUNE UP",
+            direction: "TUNE UP",
             instruction: "Tighten the string (turn peg away from you)",
             color: theme.colors.accent, 
             icon: 'arrow-up' as const,
@@ -43,7 +43,7 @@ export const TunerStateBanner: React.FC = () => {
         if (clampedCents > 20) {
           return { 
             label: "Sharp", 
-            direction: "↓ TUNE DOWN",
+            direction: "TUNE DOWN",
             instruction: "Loosen the string (turn peg toward you)",
             color: theme.colors.error,
             icon: 'arrow-down' as const,
@@ -53,7 +53,7 @@ export const TunerStateBanner: React.FC = () => {
         if (clampedCents < 0) {
           return { 
             label: "Slightly Flat", 
-            direction: "↑ Tune up a tiny bit",
+            direction: "Tune up a tiny bit",
             instruction: "Almost there — tighten gently",
             color: theme.colors.warning,
             icon: 'chevron-up' as const,
@@ -62,7 +62,7 @@ export const TunerStateBanner: React.FC = () => {
         }
         return { 
           label: "Slightly Sharp", 
-          direction: "↓ Tune down a tiny bit",
+          direction: "Tune down a tiny bit",
           instruction: "Almost there — loosen gently",
           color: theme.colors.warning,
           icon: 'chevron-down' as const,
