@@ -12,19 +12,29 @@ const Tab = createBottomTabNavigator();
 export function MainNavigator() {
   const theme = useTheme();
   
+  const isGlass = theme.base === 'glass';
+  const tabBg = isGlass 
+    ? (theme.mode === 'dark' ? 'rgba(21, 26, 40, 0.75)' : 'rgba(255, 255, 255, 0.75)')
+    : (theme.mode === 'light' ? theme.colors.surface : theme.colors.surfaceRaised);
+
+  const tabBorder = isGlass
+    ? (theme.mode === 'dark' ? 'rgba(255, 255, 255, 0.16)' : 'rgba(0, 0, 0, 0.08)')
+    : theme.colors.border;
+
   return (
     <NavigationContainer>
       <Tab.Navigator
         screenOptions={{
           headerShown: false,
           tabBarStyle: {
-            backgroundColor: theme.mode === 'light' ? theme.colors.background : '#151A28',
-            borderTopWidth: 0,
+            backgroundColor: tabBg,
+            borderWidth: 1,
+            borderColor: tabBorder,
             elevation: 8,
             shadowColor: '#000',
-            shadowOffset: { width: 0, height: 4 },
-            shadowOpacity: 0.15,
-            shadowRadius: 12,
+            shadowOffset: { width: 0, height: 6 },
+            shadowOpacity: theme.mode === 'light' ? 0.08 : 0.25,
+            shadowRadius: 16,
             height: 64,
             paddingBottom: 0,
             paddingTop: 0,

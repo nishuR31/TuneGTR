@@ -56,23 +56,44 @@ export const CentsGauge: React.FC = () => {
   const showLeftArrow = isActive && clampedCents < -3;
   const showRightArrow = isActive && clampedCents > 3;
 
+  // Format cent display value contextually and cleanly
+  const formatCentsDisplay = () => {
+    if (!isActive) return "—";
+    if (tunerState === "in_tune" || Math.abs(cents) <= 2) {
+      return "0.0 ¢";
+    }
+    if (cents < 0) {
+      return `♭ ${Math.abs(cents).toFixed(1)} ¢`;
+    }
+    return `♯ +${cents.toFixed(1)} ¢`;
+  };
+
   return (
     <View className="items-center w-full">
-      {/* Label row with directional arrows */}
+      {/* Label row with directional arrows and clear pitch difference */}
       <View className="flex-row justify-between items-center w-full mb-1 px-2">
         <View className="flex-row items-center">
           {showLeftArrow && (
             <Feather name="chevron-left" size={14} color={markerColor} className="mr-0.5" />
           )}
-          <AppText variant="caption" color="secondary" className="uppercase tracking-[1px] text-[11px]">FLAT</AppText>
+          <AppText variant="caption" color="secondary" className="uppercase tracking-[1px] text-[11px] font-semibold">
+            ♭ FLAT
+          </AppText>
         </View>
-        <AppText variant="caption" className="font-semibold text-xs" style={{ color: markerColor }}>
-          {isActive
-            ? `${cents >= 0 ? "+" : ""}${cents.toFixed(1)}¢`
-            : "—¢"}
-        </AppText>
+
+        <View 
+          className="px-2.5 py-0.5 rounded-full"
+          style={{ backgroundColor: isActive ? (tunerState === 'in_tune' ? theme.colors.successSoft : theme.colors.surfaceRaised) : 'transparent' }}
+        >
+          <AppText variant="caption" className="font-bold text-xs" style={{ color: markerColor }}>
+            {formatCentsDisplay()}
+          </AppText>
+        </View>
+
         <View className="flex-row items-center">
-          <AppText variant="caption" color="secondary" className="uppercase tracking-[1px] text-[11px]">SHARP</AppText>
+          <AppText variant="caption" color="secondary" className="uppercase tracking-[1px] text-[11px] font-semibold">
+            SHARP ♯
+          </AppText>
           {showRightArrow && (
             <Feather name="chevron-right" size={14} color={markerColor} className="ml-0.5" />
           )}
@@ -99,7 +120,17 @@ export const CentsGauge: React.FC = () => {
         {/* Moving marker */}
         {isActive && (
           <Animated.View className="absolute items-center justify-center -translate-x-2" style={markerStyle}>
-            <View className="w-4 h-4 rounded-full shadow-md" style={{ backgroundColor: markerColor, elevation: 4 }} />
+            <View 
+              className="w-4 h-4 rounded-full" 
+              style={{ 
+                backgroundColor: markerColor, 
+                shadowColor: markerColor,
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.4,
+                shadowRadius: 6,
+                elevation: 4,
+              }} 
+            />
           </Animated.View>
         )}
       </View>

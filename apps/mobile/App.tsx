@@ -13,7 +13,7 @@ import { Toaster } from 'sonner-native';
 export default function App() {
   // Dynamically update the web favicon based on system theme
   useEffect(() => {
-    if (Platform.OS === 'web') {
+    if (Platform.OS === 'web' && typeof window !== 'undefined') {
       const matcher = window.matchMedia('(prefers-color-scheme: dark)');
       
       const updateFavicon = (isDark: boolean) => {
@@ -23,7 +23,6 @@ export default function App() {
           link.rel = 'icon';
           document.head.appendChild(link);
         }
-        // Assuming your favicons are hosted or copied to the public output
         link.href = isDark ? '/favicon-dark.png' : '/favicon-light.png';
       };
 

@@ -20,6 +20,10 @@
       "infoPlist": {
         "NSMicrophoneUsageDescription": "Guitar Tuner needs microphone access to detect the pitch of your guitar strings. Audio is processed locally and never recorded or uploaded."
       },
+      "icon": {
+        "light": "./assets/icon-light.png",
+        "dark": "./assets/icon-dark.png"
+      },
       "darkIcon": "./assets/icon-dark.png"
     },
     "android": {
@@ -39,10 +43,10 @@
     "splash": {
       "image": "./assets/splash-light.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff",
+      "backgroundColor": "#EEF1F7",
       "dark": {
         "image": "./assets/splash-dark.png",
-        "backgroundColor": "#000000"
+        "backgroundColor": "#111522"
       }
     }
   }

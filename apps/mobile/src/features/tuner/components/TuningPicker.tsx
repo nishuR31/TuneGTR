@@ -84,7 +84,7 @@ export const TuningPicker: React.FC = () => {
               bounces={true}
             >
               {/* Capo Selector */}
-              <AppSurface level="base" className="rounded-2xl p-4 mb-6" style={{ backgroundColor: theme.colors.surfaceElevated }}>
+              <AppSurface level="base" className="rounded-2xl p-4 mb-6" style={{ backgroundColor: theme.colors.surfaceRaised }}>
                 <View className="flex-row items-center justify-between mb-4">
                   <AppText variant="body" className="font-semibold text-lg">Capo Position</AppText>
                   <AppText variant="caption" color="muted">Fret {capoFret}</AppText>
