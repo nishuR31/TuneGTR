@@ -30,7 +30,7 @@ export const PermissionPrompt: React.FC<PermissionPromptProps> = ({
   return (
     <View className="flex-1 justify-center items-center px-6">
       <AppSurface isCard level="elevated" className="items-center w-full p-8 rounded-3xl">
-        <View className="w-20 h-20 bg-blue-50 dark:bg-blue-900/30 rounded-full items-center justify-center mb-6">
+        <View style={{ width: 80, height: 80, borderRadius: 40, backgroundColor: theme.colors.accentSoft, alignItems: 'center', justifyContent: 'center', marginBottom: 24, shadowColor: theme.colors.accent, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.18, shadowRadius: 12, elevation: 5 }}>
           <Feather name="mic" size={32} color={theme.colors.accent} />
         </View>
 

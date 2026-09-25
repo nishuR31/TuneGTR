@@ -21,11 +21,10 @@ export const NoteDisplay: React.FC = React.memo(() => {
   const noteFontSize = layout.isCompact ? 64 : layout.isShortScreen ? 72 : 88;
 
   const isInTune = tunerState === 'in_tune';
-  const glowColor = isInTune 
-    ? 'rgba(0, 230, 118, 0.3)' 
-    : theme.mode === 'light' 
-      ? 'rgba(124, 131, 217, 0.3)' 
-      : 'rgba(150, 155, 255, 0.2)';
+  // Clay glow: use theme successSoft / accentSoft — warm and opaque-friendly
+  const glowColor = isInTune
+    ? theme.colors.successSoft
+    : theme.colors.accentSoft;
 
   const noteColor = isInTune 
     ? theme.colors.success 

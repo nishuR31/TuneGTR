@@ -1,11 +1,11 @@
 import { ThemeColors, ThemeRadius, ThemeSpacing, ThemeEffects } from './types';
 
-// Shared base measurements
+// Claymorphism relies on shadows, not blur or transparency
 const radius: ThemeRadius = {
-  sm: 8,
-  md: 16,
-  lg: 24,
-  xl: 32,
+  sm: 10,
+  md: 18,
+  lg: 26,
+  xl: 36,
   round: 999,
 };
 
@@ -18,58 +18,63 @@ const spacing: ThemeSpacing = {
   xxl: 48,
 };
 
-// Claymorphism relies on shadows, not heavy borders or blur
 const effects: ThemeEffects = {
-  blur: 0,
+  blur: 0,           // zero blur — clay is opaque
   opacity: 1,
-  shadowOpacity: 0.25,
-  shadowRadius: 16,
-  shadowOffset: { width: 4, height: 4 },
+  shadowOpacity: 0.14,
+  shadowRadius: 18,
+  shadowOffset: { width: 4, height: 6 },
 };
 
-// Colors based on Soft Clay Specification
+/**
+ * Soft Clay Light — warm off-white base, periwinkle accents,
+ * tactile surfaces that feel pillowy and touchable.
+ */
 export const clayLightColors: ThemeColors = {
-  background: "#EEF1F7",
-  surface: "#F4F6FA",
-  surfaceRaised: "#E8ECF3",
-  
+  background: "#F0F2F8",
+  surface: "#F7F8FC",
+  surfaceRaised: "#EAECF4",
+
   text: "#252B3A",
-  textSecondary: "#727B90",
-  textMuted: "#9AA3B5",
-  
-  accent: "#7C83D9",
-  accentSoft: "#D9DCFA",
-  success: "#70B996",
-  successSoft: "#D8EFE2",
-  warning: "#D5A85C",
-  warningSoft: "#F3E7C8",
-  error: "#D98282",
-  errorSoft: "#F3D9D9",
-  
-  border: "rgba(0,0,0,0.03)",
-  highlight: "rgba(255,255,255,0.8)",
+  textSecondary: "#6B7491",
+  textMuted: "#9BA5BD",
+
+  accent: "#7178D4",
+  accentSoft: "#DCDFFE",
+  success: "#5BB893",
+  successSoft: "#D4EFE3",
+  warning: "#D4A24E",
+  warningSoft: "#F4E8CA",
+  error: "#D47A7A",
+  errorSoft: "#F4DADA",
+
+  border: "rgba(113,120,212,0.08)",
+  highlight: "rgba(255,255,255,0.92)",
 };
 
+/**
+ * Soft Clay Dark — deep navy-indigo base, glowing accents.
+ */
 export const clayDarkColors: ThemeColors = {
-  background: "#111522",
-  surface: "#181D2C",
-  surfaceRaised: "#202638",
-  
-  text: "#F1F3FA",
-  textSecondary: "#AAB2C5",
-  textMuted: "#70798F",
-  
-  accent: "#969BFF",
-  accentSoft: "#363B6A",
-  success: "#78C7A0",
-  successSoft: "#294A3B",
-  warning: "#D9B76D",
-  warningSoft: "#4A4027",
-  error: "#DD8585",
-  errorSoft: "#4A2E32",
-  
-  border: "rgba(255,255,255,0.03)",
-  highlight: "rgba(255,255,255,0.06)",
+  background: "#10131F",
+  surface: "#171B2C",
+  surfaceRaised: "#1E2336",
+
+  text: "#EEF0FA",
+  textSecondary: "#A8B0CC",
+  textMuted: "#68738F",
+
+  accent: "#9298FF",
+  accentSoft: "#353A72",
+  success: "#72C49E",
+  successSoft: "#28453A",
+  warning: "#D9B468",
+  warningSoft: "#483E24",
+  error: "#D98080",
+  errorSoft: "#4A2B2B",
+
+  border: "rgba(255,255,255,0.04)",
+  highlight: "rgba(255,255,255,0.07)",
 };
 
 export const getClayTheme = (mode: 'light' | 'dark') => ({

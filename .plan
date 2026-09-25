@@ -1,1 +1,49 @@
-Planning to fix calibration, noise, add UI and sound
+# Guitar Tuner — .plan
+
+## Session Goals & Approach
+
+### Issues from user (session 2)
+1. Go full claymorphism — remove every trace of glassmorphism
+2. Keep app fast (previous session fixes carry over)
+3. Always read fresh sounds — never process stale queued audio
+4. When new string is plucked, show new string results immediately (not old string)
+
+## Approach
+
+### Theme: Full Claymorphism
+- ThemeProvider: glass → clay (getClayTheme)
+- AppSurface: removed all glass/blur/backdrop-filter branches. Pure clay only.
+  - Ambient drop shadow + inset specular highlight
+  - Opaque backgrounds, zero transparency
+  - Web: full box-shadow with inset highlight
+- clay.ts: enhanced palette
+  - Light: #F0F2F8 background, #F7F8FC surface, #7178D4 accent
+  - Rounded radii (sm=10, md=18, lg=26) for pillowy clay feel
+  - Zero blur in effects
+- TunerScreen: clay gradient (#EDF0F8 → #F4F6FC light, navy dark)
+- ErrorBoundary: clay colors (#F0F2F8 bg, #7178D4 accent, clay shadows)
+
+### Audio: Fresh Frames Only — "Latest Frame Wins"
+Problem: After 5 plucks+stop, JS event loop had queued audio frames
+that were still being processed seconds later, showing ghost results.
+
+Solution (useTuner.ts complete rewrite):
+1. **Stale frame detection**: Track `lastFrameReceivedAt`. If a frame
+   arrives >60ms after the previous one, the queue was backing up.
+   Drop it and clear pending updates. Next real frame shows current state.
+2. **New-string reset**: Track `lastPublishedFreq`. If incoming frequency
+   jumps >120 cents from last published, this is a new string pluck.
+   Reset StabilityFilter immediately so old string results don't bleed in.
+3. **Rate limiter**: MIN_FRAME_GAP=15ms (~66fps input cap).
+4. **Noise gate clears in 2 frames** (was 3).
+5. **StabilityFilter**: history=2, EMA=0.6 — locks on in ≤2 frames.
+6. **State updates**: 25ms (40fps).
+
+## Status: COMPLETE
+
+## Previous Session (session 1)
+1. ±5Hz in-tune window (freq-based, not cents)
+2. Haptics: Success/Light/Soft/Medium on state transitions
+3. Lock-on string wired in TunerScreen
+4. ErrorBoundary + cacheCleanup utility
+5. WaveVisualizer instant attack amplitude, Hanning window

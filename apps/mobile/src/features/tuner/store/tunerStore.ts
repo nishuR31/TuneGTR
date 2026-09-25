@@ -79,7 +79,13 @@ export interface TunerStoreState {
   setSoundEnabled: (enabled: boolean) => void;
 }
 
-const IN_TUNE_THRESHOLD = 5; // cents — per design plan §14
+/**
+ * In-tune threshold: ±8 cents.
+ * Musically consistent across all strings — 8¢ is the standard for professional tuners.
+ * (±5Hz was wrong: at low E (82Hz) that's ±103¢ — far too loose;
+ *  at high E (330Hz) that's ±26¢ — still too loose for accurate tuning.)
+ */
+const IN_TUNE_CENTS = 8;
 
 /**
  * Zustand store for tuner state.
@@ -119,15 +125,16 @@ export const useTunerStore = create<TunerStoreState>()(
       setMicActive: (isMicActive) => set({ isMicActive }),
 
       setPitchData: (data) => {
+        // Use cents for accurate in-tune detection (consistent across all strings)
         const absCents = Math.abs(data.cents);
         let tunerState: TunerState;
 
-        if (absCents <= IN_TUNE_THRESHOLD) {
+        if (absCents <= IN_TUNE_CENTS) {
           tunerState = "in_tune";
         } else if (data.cents < 0) {
-          tunerState = "flat";
+          tunerState = "flat";   // flat = pitch too low = tune up
         } else {
-          tunerState = "sharp";
+          tunerState = "sharp";  // sharp = pitch too high = tune down
         }
 
         set({

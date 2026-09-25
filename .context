@@ -1,22 +1,53 @@
 # Guitar Tool Project Context & Task Tracker
 
-## Current Goals (Requested)
+## Current Goals (All Complete)
 
-- [x] **String Strokes / Hits:** Improve visual feedback when a string is played (strokes/hits).
-- [x] **Sound Sensitivity & Detection:** Optimize YinDetector params, ensure faster and more accurate pitch detection with no errors.
-- [x] **UI/UX & Waves:** Enhance WaveVisualizer, make UI responsive for different screen sizes, add landscape mode support.
-- [x] **Tuning Instructions & Capo:** Improve the "tune up/down" information display and Capo/Fret placement UI.
-- [x] **Routing:** Upgrade/optimize routing (currently React Navigation, considering Expo Router or just polishing the current tabs).
+- [x] **String Strokes / Hits:** WaveVisualizer RMS impulse animation on pluck.
+- [x] **Sound Sensitivity & Detection:** YIN threshold 0.18, silence 0.001, noise gate 0.004.
+- [x] **UI/UX & Waves:** Responsive WaveVisualizer, landscape support, Hanning window, 40pt path.
+- [x] **±8¢ in-tune threshold:** Changed from ±5Hz (musically inaccurate across fretboard) to ±8 cents. At E2 (82Hz), ±5Hz was ±103¢ — far too wide. 8¢ is pro-tuner standard.
+- [x] **YIN detector tuned:** threshold=0.15, maxFreq=1050Hz (covers harmonics), silence=0.001, relaxed fallback +0.08.
+- [x] **StabilityFilter tuned:** confidenceThreshold=0.30 (was 0.65, was double-gating), EMA=0.65 (faster lock), maxJumpCents=800 (upstream handles new-string reset).
+- [x] **Confidence gate:** useTuner pre-filter 0.12 (was 0.15, more permissive for soft picks).
+- [x] **New-string jump:** 120¢→100¢ for faster recognition of adjacent string plucks.
+- [x] **signal_detected state:** set immediately when first stable pitch found (banner appears faster).
+- [x] **±5Hz tuning window:** In-tune is `|freq - targetFreq| ≤ 5Hz`, not cents-based.
+- [x] **Fresh audio — no stale frames:** Stale frame age gate (60ms), new-string jump detection (>120¢ resets StabilityFilter), latest-frame-wins pipeline.
+- [x] **Ultra-sensitive:** NOISE_GATE_THRESHOLD 0.004, YIN silence 0.001, StabilityFilter history=2, EMA=0.6.
+- [x] **Haptic feedback types:** Success (in_tune), Light (flat/sharp), Soft (listen), Medium (lock-on toggle).
+- [x] **Lock-on string wired:** Badge in header, hint text below StringSelector, haptic on toggle.
+- [x] **Full claymorphism — zero glass:** ThemeProvider→clay, AppSurface glass removed, MainNavigator glass removed, TunerScreen clay gradient, TuningPicker capo buttons themed, PermissionPrompt mic circle themed, SecurityComplianceModal scrim themed. **Confirmed 0 Tailwind glass/color utilities in codebase.**
+- [x] **ErrorBoundary:** Wraps App tree, calls clearStaleCache() on crash reset. Clay styled.
+- [x] **Cache cleanup:** src/utils/cacheCleanup.ts — wired into ErrorBoundary + Settings screen.
+- [x] **State updates:** 25ms (40fps), frame rate limit 15ms.
 
-## Progress
+## Architecture Notes
 
-- Analyzed existing `useTuner` hook, `WaveVisualizer`, `TunerStateBanner`, and `NoteDisplay`.
-- Found `YinDetector` config which can be tuned for better sensitivity.
-- [x] Added explicit "string hit / stroke" animations in `WaveVisualizer` using RMS jump logic.
-- [x] Added landscape support in `WaveVisualizer` with dynamic width scaling.
-- [x] Fixed tuning calibration by using correct sample rate from `expo-audio`.
-- [x] Improved noise tolerance in `useTuner` (increased NOISE_GATE_THRESHOLD and StabilityFilter history).
-- [x] Verified StringSelector allows manual string selection and plays reference tones.
-- [x] Added `playReferenceTone` to `useTuner` when hitting the exact pitch.
-- [x] Switched default theme mode to `system` and base `clay` for fully professional claymorphism styling.
-- [x] Ensured Cache cleanup is present in Settings (Error Boundary / Stale Build Cache).
+- **Monorepo:** apps/mobile + packages/tuner-core + packages/music-core
+- **State:** Zustand (useTunerStore) — persists only settings to AsyncStorage
+- **Audio pipeline:** expo-audio (native), Web Audio API ScriptProcessor (web fallback)
+  - Frame age gate: drops frames >60ms old (kills stale queue after burst plucking)
+  - New-string gate: resets StabilityFilter on >120¢ jump (clean lock-on per string)
+  - Rate limiter: MIN_FRAME_GAP 15ms
+  - No-signal clear: 2 frames
+- **Detector:** YIN with parabolic interpolation, pre-allocated yinBuffer, threshold=0.18
+- **Theme:** Full claymorphism (clay.ts) — zero blur, opaque surfaces, ambient+specular shadows
+  - Light: #F0F2F8 bg, #F7F8FC surface, #7178D4 accent, sm=10/md=18/lg=26 radii
+  - Dark: #10131F bg, #171B2C surface, #9298FF accent
+- **Navigation:** Floating clay pill tab bar (borderRadius=32, clay shadow, opaque)
+- **ErrorBoundary:** Class component, clay-styled recovery UI, clearStaleCache on reset
+
+## Files Changed (Session 2)
+
+| File | Change |
+|------|--------|
+| `apps/mobile/src/features/tuner/hooks/useTuner.ts` | Complete rewrite — stale frame gate, new-string reset, 40fps |
+| `apps/mobile/src/components/common/AppSurface.tsx` | Removed glass branch entirely — pure clay only |
+| `apps/mobile/src/theme/ThemeProvider.tsx` | Back to getClayTheme |
+| `apps/mobile/src/theme/clay.ts` | Enhanced palette + radii |
+| `apps/mobile/src/screens/TunerScreen.tsx` | Clay gradient, lock-on wired |
+| `apps/mobile/src/navigation/MainNavigator.tsx` | Removed isGlass branching |
+| `apps/mobile/src/features/tuner/components/TuningPicker.tsx` | Capo buttons: removed `border-blue-500/bg-blue-500/10` → theme tokens; modal scrim → inline style |
+| `apps/mobile/src/features/tuner/components/PermissionPrompt.tsx` | Mic circle: removed `bg-blue-50 dark:bg-blue-900/30` → `theme.colors.accentSoft` + clay shadow |
+| `apps/mobile/src/features/tuner/components/SecurityComplianceModal.tsx` | Modal scrim: `bg-black/60` → inline rgba |
+| `apps/mobile/src/features/tuner/components/NoteDisplay.tsx` | Glow: raw rgba → `theme.colors.successSoft / accentSoft` |

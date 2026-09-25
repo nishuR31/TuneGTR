@@ -50,7 +50,7 @@ export const TuningPicker: React.FC = () => {
         animationType="slide"
         onRequestClose={closeModal}
       >
-        <View className="flex-1 justify-end bg-black/40">
+        <View className="flex-1 justify-end" style={{ backgroundColor: 'rgba(10,12,24,0.55)' }}>
           <Pressable 
             className="flex-1" 
             onPress={closeModal}
@@ -90,22 +90,38 @@ export const TuningPicker: React.FC = () => {
                   <AppText variant="caption" color="muted">Fret {capoFret}</AppText>
                 </View>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} className="flex-row">
-                  {[0, 1, 2, 3, 4, 5, 6, 7].map((fret) => (
+                  {[0, 1, 2, 3, 4, 5, 6, 7].map((fret) => {
+                    const isCapoSelected = capoFret === fret;
+                    return (
                     <TouchableOpacity
                       key={fret}
                       onPress={() => {
                         setCapoFret(fret);
                         clearPitchData();
                       }}
-                      className={`w-12 h-12 rounded-full items-center justify-center mr-3 border-2 ${
-                        capoFret === fret ? 'border-blue-500 bg-blue-500/10' : 'border-gray-200 dark:border-gray-700'
-                      }`}
+                      style={{
+                        width: 48,
+                        height: 48,
+                        borderRadius: 24,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        marginRight: 12,
+                        borderWidth: 2,
+                        borderColor: isCapoSelected ? theme.colors.accent : theme.colors.border,
+                        backgroundColor: isCapoSelected ? theme.colors.accentSoft : theme.colors.surface,
+                        shadowColor: isCapoSelected ? theme.colors.accent : 'transparent',
+                        shadowOffset: { width: 0, height: 2 },
+                        shadowOpacity: isCapoSelected ? 0.20 : 0,
+                        shadowRadius: 6,
+                        elevation: isCapoSelected ? 3 : 0,
+                      }}
                     >
-                      <AppText className={`font-semibold ${capoFret === fret ? 'text-blue-500' : 'text-gray-500 dark:text-gray-400'}`}>
+                      <AppText style={{ fontWeight: '700', color: isCapoSelected ? theme.colors.accent : theme.colors.textMuted }}>
                         {fret === 0 ? 'Off' : fret}
                       </AppText>
                     </TouchableOpacity>
-                  ))}
+                    );
+                  })}
                 </ScrollView>
               </AppSurface>
 

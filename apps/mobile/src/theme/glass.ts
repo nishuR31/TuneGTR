@@ -50,27 +50,27 @@ export const glassDarkColors: ThemeColors = {
   highlight: "rgba(255,255,255,0.16)",
 };
 
-// Light mode glass is extremely rare but must be supported
+// Light mode glass: pure soft white with translucent gloss surfaces
 export const glassLightColors: ThemeColors = {
-  background: "#F8FAFC",
-  surface: "rgba(0,0,0,0.04)",
-  surfaceRaised: "rgba(0,0,0,0.08)",
-  
-  text: "#0F172A",
-  textSecondary: "#334155",
-  textMuted: "#64748B",
-  
-  accent: "#6366F1",
-  accentSoft: "rgba(99,102,241,0.15)",
-  success: "#10B981",
-  successSoft: "rgba(16,185,129,0.15)",
-  warning: "#F59E0B",
-  warningSoft: "rgba(245,158,11,0.15)",
-  error: "#EF4444",
-  errorSoft: "rgba(239,68,68,0.15)",
-  
-  border: "rgba(0,0,0,0.08)",
-  highlight: "rgba(255,255,255,0.6)",
+  background: "#FFFFFF",
+  surface: "rgba(255,255,255,0.72)",
+  surfaceRaised: "rgba(255,255,255,0.90)",
+
+  text: "#1A1A2E",
+  textSecondary: "#4A4E69",
+  textMuted: "#8E9AAF",
+
+  accent: "#5C6BC0",
+  accentSoft: "rgba(92,107,192,0.14)",
+  success: "#2EB87E",
+  successSoft: "rgba(46,184,126,0.14)",
+  warning: "#E8A838",
+  warningSoft: "rgba(232,168,56,0.14)",
+  error: "#E05260",
+  errorSoft: "rgba(224,82,96,0.14)",
+
+  border: "rgba(92,107,192,0.15)",
+  highlight: "rgba(255,255,255,0.9)",
 };
 
 export const getGlassTheme = (mode: 'light' | 'dark') => ({

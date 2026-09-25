@@ -22,7 +22,7 @@ export const SecurityComplianceModal: React.FC<SecurityComplianceModalProps> = (
       animationType="slide"
       onRequestClose={onClose}
     >
-      <View className="flex-1 bg-black/60 justify-end">
+      <View className="flex-1 justify-end" style={{ backgroundColor: 'rgba(10,12,24,0.60)' }}>
         <TouchableOpacity className="flex-1" onPress={onClose} activeOpacity={1} />
         
         <AppSurface 

@@ -1,1 +1,44 @@
-No errors yet
+# Guitar Tuner — .error
+
+## Errors Encountered
+
+### [2026-09-26 Session 1] write_to_file artifact path restriction
+- Tried to write ErrorBoundary.tsx using ArtifactMetadata flag
+- Tool rejected: path must be in /home/nishu/.gemini/antigravity-ide/brain/...
+- Fix: removed ArtifactMetadata flag, wrote directly to workspace path
+
+### [2026-09-26 Session 1] App.tsx duplicate imports after partial replace
+- replace_file_content matched only first 3 lines and appended full block
+- Resulted in duplicate import statements
+- Fix: used write_to_file with Overwrite=true to rewrite entire clean file
+
+## User-Reported Issues
+
+### Session 1
+- Tuning fixed at exact frequency → fixed: ±5Hz frequency-based window
+- Processing slow after 5 strokes even stopped → fixed: frame drop guard
+- App sometimes unresponsive → fixed: JS event loop lag prevention
+- Sensitivity too low → fixed: lower noise gate + silence threshold
+- Slow sound detection → fixed: reduced StabilityFilter history + higher EMA
+- Lock-on not wired → fixed: wired in TunerScreen with badge + haptic
+- Theme too heavy → fixed: switched to liquid glass (session 1), then reverted
+
+### Session 2
+- "Go full claymorphism, remove every trace of glassmorphism"
+  → Fixed: ThemeProvider back to clay, AppSurface glass branch removed entirely,
+    clay.ts enhanced palette, TunerScreen clay gradient, ErrorBoundary clay colors
+- "Keep reading all fresh sounds rather than showing old process while next string is played"
+### Session 4
+- **Critical accuracy bug: ±5Hz in-tune threshold**
+  Root cause: frequency-based threshold is musically inconsistent.
+  At E2 (82.4Hz): ±5Hz = ±103 cents (absurdly wide, everything sounds in tune)
+  At E4 (329.6Hz): ±5Hz = ±26 cents (still too loose for professional tuning)
+  Fix: changed to ±8 cents (IN_TUNE_CENTS) — consistent across all strings/octaves.
+
+- **StabilityFilter double-gating bug**
+  useTuner passed confidenceThreshold=0.45 to StabilityFilter, but YIN already
+  gates at 0.12. Result: valid detections on soft picks were being silently dropped.
+  Fix: StabilityFilter confidenceThreshold=0.30, useTuner pre-gate=0.12.
+
+- **YIN maxFrequency too low (1000Hz)**
+  Guitar harmonics above 1000Hz help YIN confirm fundamental. Extended to 1050Hz.

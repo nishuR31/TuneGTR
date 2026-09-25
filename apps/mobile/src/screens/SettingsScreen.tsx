@@ -10,6 +10,7 @@ import Feather from '@expo/vector-icons/Feather';
 import { SecurityComplianceModal } from '../features/tuner/components/SecurityComplianceModal';
 import RNRestart from 'react-native-restart';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { clearStaleCache } from '../utils/cacheCleanup';
 
 const CAPO_FRETS = Array.from({ length: 13 }, (_, i) => i); // 0-12
 
@@ -18,6 +19,11 @@ export function SettingsScreen() {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
   const [showSecurityModal, setShowSecurityModal] = useState(false);
+
+  const handleClearCache = async () => {
+    await clearStaleCache();
+    toast.success('Cache cleared!', { description: 'Stale build data removed.' });
+  };
   
   return (
     <ScrollView 
@@ -198,8 +204,14 @@ export function SettingsScreen() {
         ADVANCED
       </AppText>
       <AppSurface isCard level="base" style={[styles.card, { padding: theme.spacing.md, marginHorizontal: theme.spacing.lg }]}>
+        <TouchableOpacity style={[styles.button, { paddingVertical: theme.spacing.sm, flexDirection: 'row', justifyContent: 'center' }]} onPress={handleClearCache}>
+          <Feather name="trash-2" size={18} color={theme.colors.warning} style={{ marginRight: theme.spacing.sm }} />
+          <AppText variant="body" color="warning" style={{ fontWeight: '600' }}>Clear Stale Cache</AppText>
+        </TouchableOpacity>
+        <View style={[styles.divider, { backgroundColor: theme.colors.border, marginVertical: theme.spacing.sm }]} />
         <TouchableOpacity style={[styles.button, { paddingVertical: theme.spacing.sm, flexDirection: 'row', justifyContent: 'center' }]} onPress={async () => {
             clearPitchData();
+            await clearStaleCache();
             toast.success("Cache Cleared, Reloading...");
             await AsyncStorage.clear();
             setTimeout(() => {

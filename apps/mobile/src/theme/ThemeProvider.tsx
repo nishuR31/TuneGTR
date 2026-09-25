@@ -13,15 +13,15 @@ export const useTheme = () => {
   return context;
 };
 
+/**
+ * Full claymorphism theme provider.
+ * Soft clay palette: warm whites, tactile shadows, zero blur.
+ */
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const systemColorScheme = useColorScheme();
-
-  // Resolve actual mode (light/dark) handling 'system' preference
   const resolvedMode: ThemeMode = systemColorScheme === 'dark' ? 'dark' : 'light';
 
-  const theme: Theme = useMemo(() => {
-    return getClayTheme(resolvedMode);
-  }, [resolvedMode]);
+  const theme: Theme = useMemo(() => getClayTheme(resolvedMode), [resolvedMode]);
 
   return (
     <ThemeContext.Provider value={theme}>

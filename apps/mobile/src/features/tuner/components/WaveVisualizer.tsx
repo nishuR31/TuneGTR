@@ -1,10 +1,10 @@
 import React, { useEffect, useRef } from 'react';
 import { View, StyleSheet, useWindowDimensions } from 'react-native';
-import Animated, { 
-  useSharedValue, 
-  useAnimatedProps, 
+import Animated, {
+  useSharedValue,
+  useAnimatedProps,
   useAnimatedStyle,
-  withTiming, 
+  withTiming,
   withRepeat,
   Easing,
   interpolate,
@@ -17,13 +17,14 @@ import { useLayout } from '../../../hooks/useLayout';
 
 const AnimatedPath = Animated.createAnimatedComponent(Path);
 
-const NUM_POINTS = 60; // Increased points for smoother waves
-const MAX_HEIGHT = 80; // Increased max height
+// Reduced points: snappier compute, still smooth
+const NUM_POINTS = 40;
+const MAX_HEIGHT = 72;
 
 /**
- * Audio waveform visualizer.
- * Renders an animated SVG sine-wave pattern that reacts to RMS amplitude.
- * Includes 'stroke' impact animation for visual feedback.
+ * Audio waveform visualizer — zero-stutter, always-fresh.
+ * Uses Reanimated worklets so all animation math runs on the UI thread.
+ * Amplitude tracks RMS directly with no intermediate caching.
  */
 export const WaveVisualizer: React.FC = () => {
   const { rms, isMicActive, tunerState } = useTunerStore();
@@ -34,18 +35,17 @@ export const WaveVisualizer: React.FC = () => {
   const isActive = isMicActive;
   const isInTune = tunerState === 'in_tune';
 
-  // Phase animation — creates continuous wave motion
+  // Phase animation — smooth continuous wave
   const phase = useSharedValue(0);
   useEffect(() => {
     if (isActive) {
-      phase.value = 0;
       phase.value = withRepeat(
-        withTiming(2 * Math.PI, { duration: 1200, easing: Easing.linear }),
+        withTiming(2 * Math.PI, { duration: 900, easing: Easing.linear }),
         -1,
         false,
       );
     } else {
-      phase.value = withTiming(0, { duration: 500 });
+      phase.value = withTiming(0, { duration: 300 });
     }
   }, [isActive, phase]);
 
@@ -53,34 +53,37 @@ export const WaveVisualizer: React.FC = () => {
   const strokeScale = useSharedValue(1);
   const amplitude = useSharedValue(0);
 
-  // Amplitude envelope & Stroke impulse
+  // Amplitude envelope & stroke impulse — instant response, no lag
   useEffect(() => {
     if (isActive) {
-      // Detect sudden string pluck (jump in RMS)
-      if (rms - previousRms.current > 0.05) {
-        strokeScale.value = 1.15; // Impulse jump
-        strokeScale.value = withSpring(1.0, { mass: 0.3, damping: 10, stiffness: 200 });
+      // String pluck detection
+      const rmsDelta = rms - previousRms.current;
+      if (rmsDelta > 0.03) {
+        strokeScale.value = 1.18;
+        strokeScale.value = withSpring(1.0, { mass: 0.2, damping: 8, stiffness: 300 });
+        // Haptic on detected pluck handled by useTuner, not here
       }
-      
-      const targetAmp = Math.min(rms * 12, 1.2); 
-      amplitude.value = withSpring(targetAmp, { mass: 0.2, damping: 10, stiffness: 150 });
+      // Direct amplitude — no smoothing lag on the way up, gentle on the way down
+      const targetAmp = Math.min(rms * 14, 1.3);
+      amplitude.value = targetAmp > amplitude.value
+        ? targetAmp  // instant on attack
+        : withTiming(targetAmp, { duration: 120 }); // gentle on decay
     } else {
-      amplitude.value = withTiming(0, { duration: 400 });
+      amplitude.value = withTiming(0, { duration: 200 });
+      strokeScale.value = withTiming(1, { duration: 150 });
     }
     previousRms.current = rms;
   }, [isActive, rms, amplitude, strokeScale]);
 
-  // Wave color based on tuner state
-  const waveColor = isInTune 
+  const waveColor = isInTune
     ? theme.colors.success
-    : isActive 
-      ? theme.colors.accent 
+    : isActive
+      ? theme.colors.accent
       : theme.colors.textMuted;
 
-  // Responsive width for landscape
-  const width = layout.isLandscape 
-    ? Math.min(screenWidth * 0.7, 600) 
-    : Math.min(screenWidth - 48, 400);
+  const width = layout.isLandscape
+    ? Math.min(screenWidth * 0.7, 560)
+    : Math.min(screenWidth - 48, 380);
 
   const animatedProps = useAnimatedProps(() => {
     let d = `M 0 ${MAX_HEIGHT / 2}`;
@@ -90,31 +93,27 @@ export const WaveVisualizer: React.FC = () => {
       const x = i * step;
       const barPhase = (i / (NUM_POINTS - 1)) * 2 * Math.PI;
 
-      // Sine wave height + multiple harmonics
-      const sineValue = Math.sin(barPhase * 2 + phase.value);
-      const harmonic1 = Math.sin(4 * barPhase + phase.value * 1.5) * 0.4;
-      const harmonic2 = Math.sin(6 * barPhase + phase.value * 2.0) * 0.2;
-      const combinedWave = (sineValue + harmonic1 + harmonic2) / 1.6;
+      const sine = Math.sin(barPhase * 2 + phase.value);
+      const h1   = Math.sin(4 * barPhase + phase.value * 1.5) * 0.35;
+      const combined = (sine + h1) / 1.35;
 
-      // Window function — taper edges for smooth falloff
+      // Hanning window for smooth edge taper
       const windowPos = i / (NUM_POINTS - 1);
-      const window = Math.sin(windowPos * Math.PI);
+      const win = 0.5 * (1 - Math.cos(2 * Math.PI * windowPos));
 
-      const normalizedHeight = combinedWave * window;
       const yOffset = interpolate(
-        normalizedHeight * amplitude.value,
+        combined * win * amplitude.value,
         [-1, 1],
         [-MAX_HEIGHT / 2, MAX_HEIGHT / 2],
       );
 
-      const y = (MAX_HEIGHT / 2) + yOffset;
-      d += ` L ${x} ${y}`;
+      d += ` L ${x} ${MAX_HEIGHT / 2 + yOffset}`;
     }
-    
+
     return {
       d,
-      strokeWidth: interpolate(amplitude.value, [0, 0.5, 1.2], [2, 3.5, 5]),
-      opacity: interpolate(amplitude.value, [0, 0.5, 1.2], [0.3, 0.7, 1]),
+      strokeWidth: interpolate(amplitude.value, [0, 0.5, 1.3], [1.5, 3, 4.5]),
+      opacity: interpolate(amplitude.value, [0, 0.4, 1.3], [0.25, 0.75, 1]),
     };
   });
 
