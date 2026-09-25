@@ -110,13 +110,18 @@ export const StringSelector: React.FC = () => {
   const keyWidth = Math.min(maxKeyWidth, calculatedWidth);
   const keyHeight = layout.isShortScreen ? 52 : 60;
 
-  const handlePress = useCallback((position: number) => {
+  const handlePress = useCallback((position: number, midi: number) => {
     if (manualStringPosition === position) {
       setManualStringPosition(-1);
     } else {
       setManualStringPosition(position);
+      if (isReferenceToneSupported()) {
+        const adjustedMidi = midi + capoFret;
+        const freq = getTargetFrequency(adjustedMidi, referenceA4);
+        playReferenceTone(freq, 1500);
+      }
     }
-  }, [manualStringPosition, setManualStringPosition]);
+  }, [manualStringPosition, setManualStringPosition, capoFret, referenceA4]);
 
   const handleLongPress = useCallback((midi: number) => {
     if (isReferenceToneSupported()) {
@@ -144,7 +149,7 @@ export const StringSelector: React.FC = () => {
               capoFret={capoFret}
               width={keyWidth}
               height={keyHeight}
-              onPress={() => handlePress(s.position)}
+              onPress={() => handlePress(s.position, s.midi)}
               onLongPress={() => handleLongPress(s.midi)}
             />
           );
@@ -152,7 +157,7 @@ export const StringSelector: React.FC = () => {
       </View>
       {isReferenceToneSupported() && (
         <AppText variant="caption" color="muted" className="text-[10px] mt-1 text-center">
-          Long press a string to hear its reference tone
+          Tap a string to lock and hear its reference tone
         </AppText>
       )}
     </View>

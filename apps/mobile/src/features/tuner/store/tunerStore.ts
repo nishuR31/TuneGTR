@@ -50,6 +50,10 @@ export interface TunerStoreState {
   // Reference tone playback state
   isPlayingTone: boolean;
 
+  // Preferences
+  hapticsEnabled: boolean;
+  soundEnabled: boolean;
+
   // Actions
   setTunerState: (state: TunerState) => void;
   setMicActive: (active: boolean) => void;
@@ -71,6 +75,8 @@ export interface TunerStoreState {
   setRms: (rms: number) => void;
   setCapoFret: (fret: number) => void;
   setIsPlayingTone: (playing: boolean) => void;
+  setHapticsEnabled: (enabled: boolean) => void;
+  setSoundEnabled: (enabled: boolean) => void;
 }
 
 const IN_TUNE_THRESHOLD = 5; // cents — per design plan §14
@@ -106,6 +112,8 @@ export const useTunerStore = create<TunerStoreState>()(
       manualStringPosition: -1, // -1 = auto
       capoFret: 0,
       isPlayingTone: false,
+      hapticsEnabled: true,
+      soundEnabled: true,
 
       setTunerState: (tunerState) => set({ tunerState }),
       setMicActive: (isMicActive) => set({ isMicActive }),
@@ -148,6 +156,8 @@ export const useTunerStore = create<TunerStoreState>()(
       setRms: (rms) => set({ rms }),
       setCapoFret: (capoFret) => set({ capoFret }),
       setIsPlayingTone: (isPlayingTone) => set({ isPlayingTone }),
+      setHapticsEnabled: (hapticsEnabled) => set({ hapticsEnabled }),
+      setSoundEnabled: (soundEnabled) => set({ soundEnabled }),
     }),
     {
       name: "tuner-settings-storage",
@@ -157,6 +167,8 @@ export const useTunerStore = create<TunerStoreState>()(
         referenceA4: state.referenceA4,
         capoFret: state.capoFret,
         activeTuning: state.activeTuning,
+        hapticsEnabled: state.hapticsEnabled,
+        soundEnabled: state.soundEnabled,
       }),
     },
   ),

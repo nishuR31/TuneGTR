@@ -13,8 +13,8 @@ interface ThemeState {
 export const useThemeStore = create<ThemeState>()(
   persist(
     (set) => ({
-      mode: 'system', // default to system mode
-      base: 'clay', // default claymorphism
+      mode: 'system', // uses device system theme
+      base: 'clay', // professionally designed claymorphism
       setMode: (mode) => set({ mode }),
       setBase: (base) => set({ base }),
     }),

@@ -3,6 +3,7 @@ import { View, StyleSheet } from "react-native";
 import { useTunerStore, TunerState } from "../store/tunerStore";
 import { useTheme } from "../../../theme/ThemeProvider";
 import { AppText } from "../../../components/common/AppText";
+import { AppSurface } from "../../../components/common/AppSurface";
 import Feather from '@expo/vector-icons/Feather';
 
 /**
@@ -88,30 +89,24 @@ export const TunerStateBanner: React.FC = () => {
   if (!config.label) return null;
 
   return (
-    <View style={styles.container}>
+    <AppSurface level="raised" className="px-4 py-3 rounded-[16px] w-full max-w-[340px] items-center" style={{ backgroundColor: theme.mode === 'light' ? theme.colors.surface : theme.colors.surfaceElevated }}>
       {/* Direction arrow + label row */}
       <View style={styles.directionRow}>
-        <Feather name={config.icon} size={20} color={config.iconColor} style={{ marginRight: 6 }} />
-        <AppText variant="body" style={{ color: config.color, fontWeight: '700', fontSize: 17 }}>
+        <Feather name={config.icon} size={22} color={config.iconColor} style={{ marginRight: 8 }} />
+        <AppText variant="heading" style={{ color: config.color, fontWeight: '800', fontSize: 18, letterSpacing: 0.5 }}>
           {config.direction || config.label}
         </AppText>
       </View>
 
       {/* Instruction text */}
-      <AppText variant="caption" color="muted" style={{ fontSize: 12, marginTop: 2, textAlign: 'center' }}>
+      <AppText variant="caption" color="secondary" style={{ fontSize: 13, marginTop: 4, textAlign: 'center', opacity: 0.9 }}>
         {config.instruction}
       </AppText>
-    </View>
+    </AppSurface>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    alignItems: "center",
-    justifyContent: "center",
-    alignSelf: "center",
-    paddingVertical: 4,
-  },
   directionRow: {
     flexDirection: 'row',
     alignItems: 'center',

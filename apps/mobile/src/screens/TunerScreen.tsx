@@ -140,7 +140,7 @@ export function TunerScreen() {
         >
           
           {/* ── State Banner ── */}
-          <View className="justify-center items-center" style={{ minHeight: layout.isShortScreen ? 40 : 48 }}>
+          <View className="justify-center items-center min-h-[76px]">
             {isListening && detectedStringPosition > 0 && (
               <TunerStateBanner />
             )}

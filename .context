@@ -1,14 +1,22 @@
 # Guitar Tool Project Context & Task Tracker
 
 ## Current Goals (Requested)
-- [ ] **String Strokes / Hits:** Improve visual feedback when a string is played (strokes/hits).
-- [ ] **Sound Sensitivity & Detection:** Optimize YinDetector params, ensure faster and more accurate pitch detection with no errors.
-- [ ] **UI/UX & Waves:** Enhance WaveVisualizer, make UI responsive for different screen sizes, add landscape mode support.
-- [ ] **Tuning Instructions & Capo:** Improve the "tune up/down" information display and Capo/Fret placement UI.
-- [ ] **Routing:** Upgrade/optimize routing (currently React Navigation, considering Expo Router or just polishing the current tabs).
+
+- [x] **String Strokes / Hits:** Improve visual feedback when a string is played (strokes/hits).
+- [x] **Sound Sensitivity & Detection:** Optimize YinDetector params, ensure faster and more accurate pitch detection with no errors.
+- [x] **UI/UX & Waves:** Enhance WaveVisualizer, make UI responsive for different screen sizes, add landscape mode support.
+- [x] **Tuning Instructions & Capo:** Improve the "tune up/down" information display and Capo/Fret placement UI.
+- [x] **Routing:** Upgrade/optimize routing (currently React Navigation, considering Expo Router or just polishing the current tabs).
 
 ## Progress
+
 - Analyzed existing `useTuner` hook, `WaveVisualizer`, `TunerStateBanner`, and `NoteDisplay`.
 - Found `YinDetector` config which can be tuned for better sensitivity.
-- The UI currently lacks explicit "string hit / stroke" animations.
-- Need to add landscape support in `useLayout` and components.
+- [x] Added explicit "string hit / stroke" animations in `WaveVisualizer` using RMS jump logic.
+- [x] Added landscape support in `WaveVisualizer` with dynamic width scaling.
+- [x] Fixed tuning calibration by using correct sample rate from `expo-audio`.
+- [x] Improved noise tolerance in `useTuner` (increased NOISE_GATE_THRESHOLD and StabilityFilter history).
+- [x] Verified StringSelector allows manual string selection and plays reference tones.
+- [x] Added `playReferenceTone` to `useTuner` when hitting the exact pitch.
+- [x] Switched default theme mode to `system` and base `clay` for fully professional claymorphism styling.
+- [x] Ensured Cache cleanup is present in Settings (Error Boundary / Stale Build Cache).

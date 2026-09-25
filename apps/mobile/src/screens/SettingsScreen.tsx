@@ -14,7 +14,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const CAPO_FRETS = Array.from({ length: 13 }, (_, i) => i); // 0-12
 
 export function SettingsScreen() {
-  const { clearPitchData, referenceA4, setReferenceA4, capoFret, setCapoFret } = useTunerStore();
+  const { clearPitchData, referenceA4, setReferenceA4, capoFret, setCapoFret, hapticsEnabled, setHapticsEnabled, soundEnabled, setSoundEnabled } = useTunerStore();
   const theme = useTheme();
   const insets = useSafeAreaInsets();
   const [showSecurityModal, setShowSecurityModal] = useState(false);
@@ -135,6 +135,44 @@ export function SettingsScreen() {
       </AppSurface>
 
 
+
+      {/* ─── Preferences Section ─── */}
+      <AppText variant="caption" color="muted" style={[styles.sectionLabel, { paddingHorizontal: theme.spacing.lg, marginTop: theme.spacing.xl, marginBottom: theme.spacing.xs }]}>
+        PREFERENCES
+      </AppText>
+      <AppSurface isCard level="elevated" style={[styles.card, { padding: theme.spacing.md, marginHorizontal: theme.spacing.lg }]}>
+        <View style={[styles.row, { paddingVertical: theme.spacing.sm }]}>
+          <View style={{ flex: 1 }}>
+            <AppText variant="body" style={{ fontWeight: '500' }}>Haptic Feedback</AppText>
+            <AppText variant="caption" color="muted" style={{ marginTop: 2 }}>
+              Vibrate when a string is perfectly in tune.
+            </AppText>
+          </View>
+          <Switch
+            value={hapticsEnabled}
+            onValueChange={setHapticsEnabled}
+            trackColor={{ false: theme.colors.surface, true: theme.colors.accent }}
+            thumbColor={Platform.OS === 'android' ? theme.colors.text : ''}
+          />
+        </View>
+
+        <View style={[styles.divider, { backgroundColor: theme.colors.border, marginVertical: theme.spacing.xs }]} />
+
+        <View style={[styles.row, { paddingVertical: theme.spacing.sm }]}>
+          <View style={{ flex: 1 }}>
+            <AppText variant="body" style={{ fontWeight: '500' }}>Sound Feedback</AppText>
+            <AppText variant="caption" color="muted" style={{ marginTop: 2 }}>
+              Play a short beep when in tune.
+            </AppText>
+          </View>
+          <Switch
+            value={soundEnabled}
+            onValueChange={setSoundEnabled}
+            trackColor={{ false: theme.colors.surface, true: theme.colors.accent }}
+            thumbColor={Platform.OS === 'android' ? theme.colors.text : ''}
+          />
+        </View>
+      </AppSurface>
 
       {/* ─── Privacy & Security Section ─── */}
       <AppText variant="caption" color="muted" style={[styles.sectionLabel, { paddingHorizontal: theme.spacing.lg, marginTop: theme.spacing.xl, marginBottom: theme.spacing.xs }]}>

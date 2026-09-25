@@ -11,6 +11,7 @@ import {
   findNearestString,
 } from "@guitar-tool/music-core";
 import { useTunerStore } from "../store/tunerStore";
+import { playReferenceTone } from "../utils/toneGenerator";
 
 /**
  * Buffer size: 2048 samples at 48kHz = ~42ms latency.
@@ -25,6 +26,11 @@ const SAMPLE_RATE = 48000;
  * state updates at this rate to avoid overwhelming React renders.
  */
 const STATE_UPDATE_INTERVAL_MS = 50; // 20 FPS visual updates
+
+/**
+ * Noise gate threshold (RMS). Signal below this is ignored.
+ */
+const NOISE_GATE_THRESHOLD = 0.015;
 
 /**
  * Core tuner hook.
@@ -42,8 +48,8 @@ export const useTuner = () => {
   // Pre-configured YIN detector for sensitivity and accuracy
   // threshold (0.15 for better noise tolerance), minFreq (50Hz), maxFreq (1000Hz to catch higher harmonics)
   const detector = useRef(new YinDetector(0.15, 50, 1000)).current;
-  // Stability filter: lower frame count for faster response, slightly higher tolerance
-  const stabilityFilter = useRef(new StabilityFilter(2, 0.5, 200)).current;
+  // Stability filter: higher history for smoother values against noise
+  const stabilityFilter = useRef(new StabilityFilter(4, 0.3, 150)).current;
   const buffer = useRef(new RingBuffer(BUFFER_SIZE)).current;
   const analysisBuffer = useRef(new Float32Array(BUFFER_SIZE)).current;
   const noSignalCounter = useRef(0);
@@ -87,8 +93,18 @@ export const useTuner = () => {
         const currentRms = Math.sqrt(sum / analysisBuffer.length);
         store.setRms(currentRms);
 
+        // Apply noise gate
+        if (currentRms < NOISE_GATE_THRESHOLD) {
+          noSignalCounter.current++;
+          if (noSignalCounter.current > 5) {
+            store.clearPitchData();
+          }
+          return;
+        }
+
         // Pitch detection
-        const raw = detector.detect(analysisBuffer, SAMPLE_RATE);
+        const actualSampleRate = bufferData.sampleRate || SAMPLE_RATE;
+        const raw = detector.detect(analysisBuffer, actualSampleRate);
 
         if (!raw) {
           noSignalCounter.current++;
@@ -97,6 +113,9 @@ export const useTuner = () => {
           }
           return;
         }
+
+        // Wait for sufficient probability to avoid random noise jumps
+        if (raw.confidence < 0.2) return;
 
         const stable = stabilityFilter.process(raw);
         if (!stable) return;
@@ -117,22 +136,35 @@ export const useTuner = () => {
             }))
           : tuningStrings;
 
-        // If manual string selected, only match that string
+        // If manual string selected, calculate cents against it
         const targetStrings = store.manualStringPosition > 0
           ? adjustedStrings.filter(s => s.position === store.manualStringPosition)
           : adjustedStrings;
 
-        const nearest = findNearestString(
+        let nearest = findNearestString(
           frequency,
           targetStrings.length > 0 ? targetStrings : adjustedStrings,
           referenceA4,
         );
+
+        // Fallback to auto-detect if we're in manual mode but the frequency is completely wrong (>400 cents)
+        // This prevents the "2500 cents" bug when the wrong string/octave is played.
+        if (nearest && store.manualStringPosition > 0 && Math.abs(nearest.cents) > 400) {
+           nearest = findNearestString(frequency, adjustedStrings, referenceA4);
+        }
+
         if (!nearest) return;
+
+        const cents = getCents(frequency, nearest.targetFrequency);
+
+        // Reject noise/harmonics that are wildly outside the instrument's range
+        if (Math.abs(cents) > 400) {
+           return;
+        }
 
         const midi = getMidi(frequency, referenceA4);
         const noteName = getPitchClass(midi);
         const octave = Math.floor(midi / 12) - 1;
-        const cents = getCents(frequency, nearest.targetFrequency);
 
         const update = {
           frequency,
@@ -285,16 +317,27 @@ export const useTuner = () => {
     };
   }, [stopListening]);
 
-  // Haptic feedback when entering 'in_tune'
+  // Haptic & Sound feedback when entering 'in_tune'
   const prevTunerState = useRef(store.tunerState);
   useEffect(() => {
     if (store.tunerState === 'in_tune' && prevTunerState.current !== 'in_tune') {
-      import('expo-haptics').then(Haptics => {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
-      });
+      if (store.hapticsEnabled) {
+        import('expo-haptics').then(Haptics => {
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+        });
+      }
+      
+      if (store.soundEnabled) {
+        // Play a short beep at the target frequency when tuned perfectly
+        try {
+           playReferenceTone(store.targetFrequency || 440, 200);
+        } catch (e) {
+          // ignore
+        }
+      }
     }
     prevTunerState.current = store.tunerState;
-  }, [store.tunerState]);
+  }, [store.tunerState, store.hapticsEnabled, store.soundEnabled, store.targetFrequency]);
 
   return {
     startListening,
