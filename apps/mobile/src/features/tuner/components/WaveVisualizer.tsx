@@ -27,7 +27,9 @@ const MAX_HEIGHT = 72;
  * Amplitude tracks RMS directly with no intermediate caching.
  */
 export const WaveVisualizer: React.FC = () => {
-  const { rms, isMicActive, tunerState } = useTunerStore();
+  const rms = useTunerStore((s) => s.rms);
+  const isMicActive = useTunerStore((s) => s.isMicActive);
+  const tunerState = useTunerStore((s) => s.tunerState);
   const theme = useTheme();
   const { width: screenWidth } = useWindowDimensions();
   const layout = useLayout();

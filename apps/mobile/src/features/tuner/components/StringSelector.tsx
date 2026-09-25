@@ -82,15 +82,13 @@ const StringKey = React.memo(({
 });
 
 export const StringSelector: React.FC = () => {
-  const {
-    activeTuning,
-    detectedStringPosition,
-    manualStringPosition,
-    setManualStringPosition,
-    tunerState,
-    referenceA4,
-    capoFret,
-  } = useTunerStore();
+  const activeTuning = useTunerStore((s) => s.activeTuning);
+  const detectedStringPosition = useTunerStore((s) => s.detectedStringPosition);
+  const manualStringPosition = useTunerStore((s) => s.manualStringPosition);
+  const setManualStringPosition = useTunerStore((s) => s.setManualStringPosition);
+  const tunerState = useTunerStore((s) => s.tunerState);
+  const referenceA4 = useTunerStore((s) => s.referenceA4);
+  const capoFret = useTunerStore((s) => s.capoFret);
   
   const layout = useLayout();
 

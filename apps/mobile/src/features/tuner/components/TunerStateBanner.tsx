@@ -18,7 +18,11 @@ import Animated, {
  * clear icons + precise cent values.
  */
 export const TunerStateBanner: React.FC = () => {
-  const { tunerState, cents, detectedStringNote, targetFrequency, frequency } = useTunerStore();
+  const tunerState = useTunerStore((s) => s.tunerState);
+  const cents = useTunerStore((s) => s.cents);
+  const detectedStringNote = useTunerStore((s) => s.detectedStringNote);
+  const targetFrequency = useTunerStore((s) => s.targetFrequency);
+  const frequency = useTunerStore((s) => s.frequency);
   const theme = useTheme();
 
   const scale = useSharedValue(0.92);

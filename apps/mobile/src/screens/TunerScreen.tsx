@@ -31,14 +31,12 @@ import Animated, {
 
 export function TunerScreen() {
   const { startListening, stopListening, isListening } = useTuner();
-  const {
-    tunerState,
-    detectedStringPosition,
-    capoFret,
-    manualStringPosition,
-    setManualStringPosition,
-    hapticsEnabled,
-  } = useTunerStore();
+  const tunerState = useTunerStore((s) => s.tunerState);
+  const detectedStringPosition = useTunerStore((s) => s.detectedStringPosition);
+  const capoFret = useTunerStore((s) => s.capoFret);
+  const manualStringPosition = useTunerStore((s) => s.manualStringPosition);
+  const setManualStringPosition = useTunerStore((s) => s.setManualStringPosition);
+  const hapticsEnabled = useTunerStore((s) => s.hapticsEnabled);
   const theme = useTheme();
   const layout = useLayout();
 

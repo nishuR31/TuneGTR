@@ -51,3 +51,8 @@
 | `.plan` | Updated root causes, approach, emoji removal, and status |
 | `.error` | Documented HAL float32 incompatibility, Hanning window CMNDF distortion, auto-start resolution, and icon migration |
 | `.context` | Updated project tracker and architecture specifications |
+
+## Performance & Rendering Fixes (Session 8)
+- [x] **Infinite Render Loop Fix:** Fixed "Maximum update depth exceeded" error by decoupling `useTunerStore()` subscriptions across the app. Components like `TunerScreen`, `StringSelector`, `WaveVisualizer`, etc., were subscribing to the entire Zustand store, causing them (and their children) to re-render 40 times a second whenever audio pitch data (cents, frequency) changed.
+- [x] **Store Selector Optimization:** Refactored `useTunerStore()` usage to explicitly select only the necessary state properties (e.g., `useTunerStore((s) => s.tunerState)`), drastically reducing unnecessary re-renders.
+- [x] **Hook Optimization:** Replaced store dependency inside `useTuner` with `useTunerStore.getState()` for internal audio callbacks (`processSamples`) to prevent the audio hook from continually recreating itself and triggering infinite loops during state dispatch.

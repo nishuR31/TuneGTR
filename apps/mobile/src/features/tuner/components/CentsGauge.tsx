@@ -42,7 +42,8 @@ function centsToAngle(cents: number): number {
 }
 
 export const CentsGauge: React.FC = () => {
-  const { cents, tunerState } = useTunerStore();
+  const cents = useTunerStore((s) => s.cents);
+  const tunerState = useTunerStore((s) => s.tunerState);
   const theme = useTheme();
   const { width: screenWidth } = useWindowDimensions();
 

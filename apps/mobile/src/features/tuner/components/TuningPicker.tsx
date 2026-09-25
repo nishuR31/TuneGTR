@@ -16,7 +16,11 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Feather from '@expo/vector-icons/Feather';
 
 export const TuningPicker: React.FC = () => {
-  const { activeTuning, setActiveTuning, clearPitchData, capoFret, setCapoFret } = useTunerStore();
+  const activeTuning = useTunerStore((s) => s.activeTuning);
+  const setActiveTuning = useTunerStore((s) => s.setActiveTuning);
+  const clearPitchData = useTunerStore((s) => s.clearPitchData);
+  const capoFret = useTunerStore((s) => s.capoFret);
+  const setCapoFret = useTunerStore((s) => s.setCapoFret);
   const [modalVisible, setModalVisible] = useState(false);
   const theme = useTheme();
   const insets = useSafeAreaInsets();

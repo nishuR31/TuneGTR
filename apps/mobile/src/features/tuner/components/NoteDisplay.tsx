@@ -21,16 +21,14 @@ import { useEffect } from "react";
  * - In-tune glow ring
  */
 export const NoteDisplay: React.FC = React.memo(() => {
-  const {
-    noteName,
-    tunerState,
-    frequency,
-    octave,
-    confidence,
-    detectedStringNote,
-    detectedStringPosition,
-    targetFrequency,
-  } = useTunerStore();
+  const noteName = useTunerStore((s) => s.noteName);
+  const tunerState = useTunerStore((s) => s.tunerState);
+  const frequency = useTunerStore((s) => s.frequency);
+  const octave = useTunerStore((s) => s.octave);
+  const confidence = useTunerStore((s) => s.confidence);
+  const detectedStringNote = useTunerStore((s) => s.detectedStringNote);
+  const detectedStringPosition = useTunerStore((s) => s.detectedStringPosition);
+  const targetFrequency = useTunerStore((s) => s.targetFrequency);
   const theme = useTheme();
   const layout = useLayout();
 

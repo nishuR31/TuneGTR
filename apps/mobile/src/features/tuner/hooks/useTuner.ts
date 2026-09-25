@@ -40,7 +40,14 @@ const NOISE_GATE_THRESHOLD = 0.003;
  * Core guitar tuner hook (optimized for Android & Web).
  */
 export const useTuner = () => {
-  const store = useTunerStore();
+  // No full store subscription
+
+  // Extract only needed values for hook return
+  const isMicActive = useTunerStore((s) => s.isMicActive);
+  const tunerState = useTunerStore((s) => s.tunerState);
+  const hapticsEnabled = useTunerStore((s) => s.hapticsEnabled);
+  const soundEnabled = useTunerStore((s) => s.soundEnabled);
+  const targetFrequency = useTunerStore((s) => s.targetFrequency);
 
   /**
    * YIN detector:
@@ -70,7 +77,7 @@ export const useTuner = () => {
 
   // State update throttle
   const lastStateUpdate = useRef(0);
-  const pendingUpdate = useRef<Parameters<typeof store.setPitchData>[0] | null>(null);
+  const pendingUpdate = useRef<Parameters<typeof useTunerStore.getState> | any>(null);
 
   // Web Audio fallback refs
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -81,17 +88,18 @@ export const useTuner = () => {
   // Flush pending state update to Zustand store
   const flushUpdate = useCallback(() => {
     if (pendingUpdate.current) {
-      store.setPitchData(pendingUpdate.current);
+      useTunerStore.getState().setPitchData(pendingUpdate.current);
       pendingUpdate.current = null;
     }
-  }, [store]);
+  }, []);
 
   /**
    * Process a Float32Array of normalized samples [-1.0, 1.0] at a given sample rate.
    */
   const processSamples = useCallback(
     (samples: Float32Array, sampleRate: number) => {
-      if (!store.isMicActive || samples.length === 0) return;
+      const state = useTunerStore.getState();
+      if (!state.isMicActive || samples.length === 0) return;
 
       const now = Date.now();
 
@@ -105,13 +113,13 @@ export const useTuner = () => {
           sum += analysisBuffer[i] * analysisBuffer[i];
         }
         const currentRms = Math.sqrt(sum / analysisBuffer.length);
-        store.setRms(currentRms);
+        state.setRms(currentRms);
 
         // Noise gate check
         if (currentRms < NOISE_GATE_THRESHOLD) {
           noSignalCounter.current++;
           if (noSignalCounter.current >= noSignalFramesNeeded.current) {
-            store.clearPitchData();
+            state.clearPitchData();
             lastPublishedFreq.current = 0;
             stabilityFilter.reset();
           }
@@ -142,9 +150,9 @@ export const useTuner = () => {
         if (!stable) return;
 
         const { frequency, confidence } = stable;
-        const referenceA4 = store.referenceA4;
-        const capoFret = store.capoFret;
-        const tuningStrings = store.activeTuning.stringsLowToHigh;
+        const referenceA4 = state.referenceA4;
+        const capoFret = state.capoFret;
+        const tuningStrings = state.activeTuning.stringsLowToHigh;
 
         // Apply capo offset if present
         const adjustedStrings = capoFret > 0
@@ -156,8 +164,8 @@ export const useTuner = () => {
           : tuningStrings;
 
         // Manual string lock filter
-        const targetStrings = store.manualStringPosition > 0
-          ? adjustedStrings.filter((s) => s.position === store.manualStringPosition)
+        const targetStrings = state.manualStringPosition > 0
+          ? adjustedStrings.filter((s) => s.position === state.manualStringPosition)
           : adjustedStrings;
 
         let nearest = findNearestString(
@@ -167,7 +175,7 @@ export const useTuner = () => {
         );
 
         // Auto-detect fallback if locked string is way off
-        if (nearest && store.manualStringPosition > 0 && Math.abs(nearest.cents) > 400) {
+        if (nearest && state.manualStringPosition > 0 && Math.abs(nearest.cents) > 400) {
           nearest = findNearestString(frequency, adjustedStrings, referenceA4);
         }
 
@@ -183,8 +191,8 @@ export const useTuner = () => {
         lastPublishedFreq.current = frequency;
 
         // Switch to signal_detected if currently listening/idle
-        if (store.tunerState === "listening" || store.tunerState === "no_signal") {
-          store.setTunerState("signal_detected");
+        if (state.tunerState === "listening" || state.tunerState === "no_signal") {
+          state.setTunerState("signal_detected");
         }
 
         const update = {
@@ -201,7 +209,7 @@ export const useTuner = () => {
 
         // Throttle updates to UI frame rate (40fps)
         if (now - lastStateUpdate.current >= STATE_UPDATE_INTERVAL_MS) {
-          store.setPitchData(update);
+          state.setPitchData(update);
           lastStateUpdate.current = now;
           pendingUpdate.current = null;
         } else {
@@ -211,19 +219,7 @@ export const useTuner = () => {
         console.warn("Pitch processing error:", e);
       }
     },
-    [
-      store.isMicActive,
-      store.referenceA4,
-      store.activeTuning,
-      store.manualStringPosition,
-      store.capoFret,
-      store.tunerState,
-      detector,
-      stabilityFilter,
-      buffer,
-      analysisBuffer,
-      store,
-    ],
+    [detector, stabilityFilter, buffer, analysisBuffer],
   );
 
   /**
@@ -252,10 +248,10 @@ export const useTuner = () => {
 
   // Periodic flush of pending updates
   useEffect(() => {
-    if (!store.isMicActive) return;
+    if (!isMicActive) return;
     const interval = setInterval(flushUpdate, STATE_UPDATE_INTERVAL_MS);
     return () => clearInterval(interval);
-  }, [store.isMicActive, flushUpdate]);
+  }, [isMicActive, flushUpdate]);
 
   // expo-audio stream hook: request int16 PCM for universal Android hardware support
   const { stream } = useAudioStream({
@@ -274,12 +270,12 @@ export const useTuner = () => {
       }
 
       if (!permission.granted) {
-        store.setTunerState("permission_denied");
+        useTunerStore.getState().setTunerState("permission_denied");
         return;
       }
 
-      store.setMicActive(true);
-      store.setTunerState("listening");
+      useTunerStore.getState().setMicActive(true);
+      useTunerStore.getState().setTunerState("listening");
       stabilityFilter.reset();
       noSignalCounter.current = 0;
       lastStateUpdate.current = 0;
@@ -294,7 +290,7 @@ export const useTuner = () => {
         // Web fallback using Web Audio API
         if (!navigator?.mediaDevices?.getUserMedia) {
           console.error("getUserMedia not supported");
-          store.setTunerState("error");
+          useTunerStore.getState().setTunerState("error");
           return;
         }
 
@@ -339,9 +335,9 @@ export const useTuner = () => {
       }
     } catch (error) {
       console.error("Failed to start audio capture:", error);
-      store.setTunerState("error");
+      useTunerStore.getState().setTunerState("error");
     }
-  }, [stream, processSamples, stabilityFilter, store]);
+  }, [stream, processSamples, stabilityFilter]);
 
   const stopListening = useCallback(() => {
     if (Platform.OS === "android") {
@@ -372,15 +368,15 @@ export const useTuner = () => {
       }
     }
 
-    store.setMicActive(false);
-    store.setTunerState("idle");
-    store.clearPitchData();
+    useTunerStore.getState().setMicActive(false);
+    useTunerStore.getState().setTunerState("idle");
+    useTunerStore.getState().clearPitchData();
     stabilityFilter.reset();
     noSignalCounter.current = 0;
     lastStateUpdate.current = 0;
     lastPublishedFreq.current = 0;
     pendingUpdate.current = null;
-  }, [stream, stabilityFilter, store]);
+  }, [stream, stabilityFilter]);
 
   useEffect(() => {
     return () => {
@@ -389,37 +385,37 @@ export const useTuner = () => {
   }, [stopListening]);
 
   // Haptic feedback & reference tone on in-tune state
-  const prevTunerState = useRef(store.tunerState);
+  const prevTunerState = useRef(tunerState);
   useEffect(() => {
-    if (store.tunerState !== prevTunerState.current) {
-      if (store.hapticsEnabled) {
+    if (tunerState !== prevTunerState.current) {
+      if (hapticsEnabled) {
         import("expo-haptics")
           .then((Haptics) => {
-            if (store.tunerState === "in_tune") {
+            if (tunerState === "in_tune") {
               Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
-            } else if (store.tunerState === "flat" || store.tunerState === "sharp") {
+            } else if (tunerState === "flat" || tunerState === "sharp") {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
-            } else if (store.tunerState === "listening" || store.tunerState === "signal_detected") {
+            } else if (tunerState === "listening" || tunerState === "signal_detected") {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft).catch(() => {});
             }
           })
           .catch(() => {});
       }
 
-      if (store.soundEnabled && store.tunerState === "in_tune") {
+      if (soundEnabled && tunerState === "in_tune") {
         try {
-          playReferenceTone(store.targetFrequency || 440, 200);
+          playReferenceTone(targetFrequency || 440, 200);
         } catch (e) {
           // ignore
         }
       }
     }
-    prevTunerState.current = store.tunerState;
-  }, [store.tunerState, store.hapticsEnabled, store.soundEnabled, store.targetFrequency]);
+    prevTunerState.current = tunerState;
+  }, [tunerState, hapticsEnabled, soundEnabled, targetFrequency]);
 
   return {
     startListening,
     stopListening,
-    isListening: store.isMicActive,
+    isListening: isMicActive,
   };
 };
