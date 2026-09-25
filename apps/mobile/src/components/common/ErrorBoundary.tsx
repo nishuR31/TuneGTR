@@ -6,6 +6,7 @@ import {
   StyleSheet,
   ScrollView,
 } from "react-native";
+import Feather from "@expo/vector-icons/Feather";
 import { clearStaleCache } from "../../utils/cacheCleanup";
 
 interface Props {
@@ -49,7 +50,7 @@ export class ErrorBoundary extends Component<Props, State> {
           bounces={false}
         >
           <View style={styles.iconCircle}>
-            <Text style={styles.iconText}>⚡</Text>
+            <Feather name="zap" size={28} color="#D97706" />
           </View>
           <Text style={styles.title}>App Hit a Snag</Text>
           <Text style={styles.subtitle}>

@@ -14,18 +14,7 @@
         }
       ]
     ],
-    "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.guitartool.tuner",
-      "infoPlist": {
-        "NSMicrophoneUsageDescription": "Guitar Tuner needs microphone access to detect the pitch of your guitar strings. Audio is processed locally and never recorded or uploaded."
-      },
-      "icon": {
-        "light": "./assets/icon-light.png",
-        "dark": "./assets/icon-dark.png"
-      },
-      "darkIcon": "./assets/icon-dark.png"
-    },
+
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-foreground-light.png",

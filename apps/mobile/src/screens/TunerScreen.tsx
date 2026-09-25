@@ -18,6 +18,7 @@ import { useTheme } from "../theme/ThemeProvider";
 import { useLayout } from "../hooks/useLayout";
 import { AppSurface } from "../components/common/AppSurface";
 import { AppText } from "../components/common/AppText";
+import Feather from "@expo/vector-icons/Feather";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -40,6 +41,14 @@ export function TunerScreen() {
   } = useTunerStore();
   const theme = useTheme();
   const layout = useLayout();
+
+  // Auto-start listening on screen mount
+  useEffect(() => {
+    startListening();
+    return () => {
+      stopListening();
+    };
+  }, [startListening, stopListening]);
 
   // ── Lock-on string: tap badge or detected string to lock ──
   const handleLockOnToggle = useCallback(() => {
@@ -142,9 +151,11 @@ export function TunerScreen() {
               <Pressable
                 onPress={handleLockOnToggle}
                 style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
                   backgroundColor: theme.colors.accentSoft,
                   borderRadius: theme.radius.round,
-                  paddingHorizontal: 12,
+                  paddingHorizontal: 10,
                   paddingVertical: 5,
                   marginRight: 8,
                   borderWidth: 1.5,
@@ -156,8 +167,9 @@ export function TunerScreen() {
                   elevation: 3,
                 }}
               >
+                <Feather name="lock" size={11} color={theme.colors.accent} style={{ marginRight: 4 }} />
                 <AppText style={{ color: theme.colors.accent, fontSize: 11, fontWeight: '800', letterSpacing: 0.5 }}>
-                  🔒 LOCKED
+                  LOCKED
                 </AppText>
               </Pressable>
             )}
@@ -214,14 +226,14 @@ export function TunerScreen() {
             <StringSelector />
             {/* Lock-on hint — shown when active and not yet locked */}
             {isListening && isActive && !isLockedOn && detectedStringPosition > 0 && (
-              <Pressable onPress={handleLockOnToggle} hitSlop={10}>
+              <Pressable onPress={handleLockOnToggle} hitSlop={10} style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 4 }}>
                 <AppText
                   variant="caption"
-                  className="text-center mt-1"
-                  style={{ fontSize: 10, color: theme.colors.accent, opacity: 0.65 }}
+                  style={{ fontSize: 10, color: theme.colors.accent, opacity: 0.65, marginRight: 2 }}
                 >
-                  Tap string to lock-on ›
+                  Tap string to lock-on
                 </AppText>
+                <Feather name="chevron-right" size={10} color={theme.colors.accent} style={{ opacity: 0.65 }} />
               </Pressable>
             )}
           </View>

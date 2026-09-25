@@ -1,18 +1,30 @@
 # Guitar Tuner — .error
 
-## Errors Encountered
+## Errors Encountered & Resolved
 
-### [2026-09-26 Session 1] write_to_file artifact path restriction
-- Tried to write ErrorBoundary.tsx using ArtifactMetadata flag
-- Tool rejected: path must be in /home/nishu/.gemini/antigravity-ide/brain/...
-- Fix: removed ArtifactMetadata flag, wrote directly to workspace path
+### [2026-09-26 Session 5-6] Android AudioRecord AudioStreamUnsupportedConfigException
+- **Error**: When `useAudioStream` was configured with `encoding: 'float32'`, `stream.start()` on Android failed with `AudioStreamUnsupportedConfigException: No supported audio configuration found for this device`.
+- **Root Cause**: Android's `AudioRecord` HAL does not implement 32-bit float (`ENCODING_PCM_FLOAT`) recording on many Android chipsets/emulators. `AudioRecord.getMinBufferSize` returned `ERROR_BAD_VALUE` (-2).
+- **Resolution**: Switched encoding to `'int16'` (`AudioFormat.ENCODING_PCM_16BIT`), which is universally supported across 100% of Android devices. Converted incoming 16-bit PCM integer samples to normalized `Float32Array` by dividing by `32768.0`.
 
-### [2026-09-26 Session 1] App.tsx duplicate imports after partial replace
-- replace_file_content matched only first 3 lines and appended full block
-- Resulted in duplicate import statements
-- Fix: used write_to_file with Overwrite=true to rewrite entire clean file
+### [2026-09-26 Session 5-6] Hanning Window Distorting YIN Time-Domain Autocorrelation
+- **Error**: Vitest failed on Low E2 (82.41 Hz): expected 83.22 Hz to be close to 82.41 Hz (error > 0.8 Hz / 17 cents). On physical audio, CMNDF was artificially elevated above threshold (>0.14), causing YIN to return `null` for real guitar plucks.
+- **Root Cause**: Window functions (Hanning, Hamming) are meant for frequency-domain FFT spectral leakage prevention. In time-domain difference functions, multiplying samples by a Hanning window causes $win[i] \cdot x[i] - win[i+\tau] \cdot x[i+\tau]$ to have large non-zero discrepancy because the envelope shape changes over lag $\tau$.
+- **Resolution**: Removed Hanning window from YIN. Difference function now runs on unwindowed samples with a constant integration window $W = N - \tau_{max}$.
 
-## User-Reported Issues
+### [2026-09-26 Session 5-6] TunerScreen Passive State (Microphone Never Started)
+- **Error**: App opened into an idle state where no microphone capture ever started.
+- **Root Cause**: `TunerScreen` lacked an auto-start `useEffect` on mount.
+- **Resolution**: Added `useEffect` in `TunerScreen` to call `startListening()` on mount and `stopListening()` on unmount.
+
+### [2026-09-26 Session 5-6] TypeScript TS2322: 'dominantBaseline' in SvgText
+- **Error**: `Property 'dominantBaseline' does not exist on type 'IntrinsicAttributes & IntrinsicClassAttributes<Text> & Readonly<TextProps>'`.
+- **Root Cause**: `react-native-svg` uses `alignmentBaseline="middle"`, not `dominantBaseline`.
+- **Resolution**: Replaced `dominantBaseline="middle"` with `alignmentBaseline="middle"`.
+
+---
+
+## User-Reported Issues History
 
 ### Session 1
 - Tuning fixed at exact frequency → fixed: ±5Hz frequency-based window
@@ -28,17 +40,27 @@
   → Fixed: ThemeProvider back to clay, AppSurface glass branch removed entirely,
     clay.ts enhanced palette, TunerScreen clay gradient, ErrorBoundary clay colors
 - "Keep reading all fresh sounds rather than showing old process while next string is played"
+
 ### Session 4
 - **Critical accuracy bug: ±5Hz in-tune threshold**
   Root cause: frequency-based threshold is musically inconsistent.
   At E2 (82.4Hz): ±5Hz = ±103 cents (absurdly wide, everything sounds in tune)
   At E4 (329.6Hz): ±5Hz = ±26 cents (still too loose for professional tuning)
   Fix: changed to ±8 cents (IN_TUNE_CENTS) — consistent across all strings/octaves.
-
 - **StabilityFilter double-gating bug**
   useTuner passed confidenceThreshold=0.45 to StabilityFilter, but YIN already
   gates at 0.12. Result: valid detections on soft picks were being silently dropped.
   Fix: StabilityFilter confidenceThreshold=0.30, useTuner pre-gate=0.12.
-
 - **YIN maxFrequency too low (1000Hz)**
   Guitar harmonics above 1000Hz help YIN confirm fundamental. Extended to 1050Hz.
+
+### Session 5-6
+- **"The app is not even taking any sound and not even recognizing any sound"**
+  Root cause: Android float32 unsupported HAL, Hanning window breaking YIN threshold, and lack of auto-start on screen mount.
+  Fix: Universal 16-bit PCM AudioRecord decoding, unwindowed constant-window YIN, and auto-start on mount.
+- **"I want android only no switch you can remove the ios dir"**
+  Fix: Removed `apps/mobile/ios/`, removed `ios` from `app.json`, removed `ios` run script from `package.json`, and eliminated iOS branching.
+
+### Session 7
+- **"Remove all emoji with icons"**
+  Removed all unicode emojis/symbols (`🔒`, `⚡`, `✓`, `↑`, `↓`, `♭`, `♯`, `›`). Replaced with Feather vector icons (`lock`, `zap`, `check-circle`, `arrow-up`, `arrow-down`, `trending-down`, `trending-up`, `chevron-right`).

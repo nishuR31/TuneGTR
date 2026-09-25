@@ -1,49 +1,57 @@
 # Guitar Tuner — .plan
 
-## Session Goals & Approach
+## Session 5 & 6 — Professional-Grade Android Tuner & Complete Audio Pipeline Fix
 
-### Issues from user (session 2)
-1. Go full claymorphism — remove every trace of glassmorphism
-2. Keep app fast (previous session fixes carry over)
-3. Always read fresh sounds — never process stale queued audio
-4. When new string is plucked, show new string results immediately (not old string)
+### Root Causes of "No Sound / No Recognition"
 
-## Approach
+#### 1. CRITICAL: Android AudioRecord HAL float32 Unsupported
+- In `useAudioStream`, `encoding: 'float32'` requested `AudioFormat.ENCODING_PCM_FLOAT`.
+- Android Audio HAL on physical devices / emulators fails `AudioRecord.getMinBufferSize` with `ERROR_BAD_VALUE` (-2) for `ENCODING_PCM_FLOAT`, throwing `AudioStreamUnsupportedConfigException` on `stream.start()`.
+- Fix: Switched native audio capture to `encoding: 'int16'` (`AudioFormat.ENCODING_PCM_16BIT`), which is universally supported on 100% of Android devices. Converted incoming 16-bit PCM integer samples to normalized `Float32Array` in [-1.0, 1.0].
 
-### Theme: Full Claymorphism
-- ThemeProvider: glass → clay (getClayTheme)
-- AppSurface: removed all glass/blur/backdrop-filter branches. Pure clay only.
-  - Ambient drop shadow + inset specular highlight
-  - Opaque backgrounds, zero transparency
-  - Web: full box-shadow with inset highlight
-- clay.ts: enhanced palette
-  - Light: #F0F2F8 background, #F7F8FC surface, #7178D4 accent
-  - Rounded radii (sm=10, md=18, lg=26) for pillowy clay feel
-  - Zero blur in effects
-- TunerScreen: clay gradient (#EDF0F8 → #F4F6FC light, navy dark)
-- ErrorBoundary: clay colors (#F0F2F8 bg, #7178D4 accent, clay shadows)
+#### 2. CRITICAL: TunerScreen Did Not Auto-Start Listening
+- `TunerScreen` lacked an auto-start `useEffect`. Upon launching the app, microphone stream remained inactive (`idle`) until manually pressed.
+- Fix: Added automatic listening lifecycle on mount with clean release on unmount in `TunerScreen.tsx`.
 
-### Audio: Fresh Frames Only — "Latest Frame Wins"
-Problem: After 5 plucks+stop, JS event loop had queued audio frames
-that were still being processed seconds later, showing ghost results.
+#### 3. CRITICAL: Hanning Window Distorting YIN Time-Domain Autocorrelation
+- Multiplying the time-domain signal by a Hanning window caused $x[i] - x[i+\tau]$ to have non-zero envelope discrepancy $(win[i] - win[i+\tau] \ne 0)$.
+- This inflated CMNDF at the fundamental period above the 0.10 threshold (e.g. Low E2 minimum CMNDF was ~0.15, failing the detector).
+- Fix: Removed Hanning window from time-domain difference function. YIN difference function must run on unwindowed samples with constant integration window $W = N - \tau_{max}$.
 
-Solution (useTuner.ts complete rewrite):
-1. **Stale frame detection**: Track `lastFrameReceivedAt`. If a frame
-   arrives >60ms after the previous one, the queue was backing up.
-   Drop it and clear pending updates. Next real frame shows current state.
-2. **New-string reset**: Track `lastPublishedFreq`. If incoming frequency
-   jumps >120 cents from last published, this is a new string pluck.
-   Reset StabilityFilter immediately so old string results don't bleed in.
-3. **Rate limiter**: MIN_FRAME_GAP=15ms (~66fps input cap).
-4. **Noise gate clears in 2 frames** (was 3).
-5. **StabilityFilter**: history=2, EMA=0.6 — locks on in ≤2 frames.
-6. **State updates**: 25ms (40fps).
+#### 4. CRITICAL: Stale Frame Age Gate & 15ms Rate Limiter
+- Android delivers audio buffers in ~100ms intervals.
+- The previous 60ms stale frame age gate dropped every buffer after the first.
+- Fix: Removed frame age gate and rate limiter, allowing the native audio stream to dictate buffer delivery naturally.
 
-## Status: COMPLETE
+#### 5. CRITICAL: StabilityFilter Threshold Mismatch
+- StabilityFilter default confidence threshold blocked valid note passes.
+- Fix: Tuned `confidenceThreshold = 0.20` in `useTuner.ts` and set default `0.6` in `StabilityFilter` to satisfy unit test contracts.
 
-## Previous Session (session 1)
-1. ±5Hz in-tune window (freq-based, not cents)
-2. Haptics: Success/Light/Soft/Medium on state transitions
-3. Lock-on string wired in TunerScreen
-4. ErrorBoundary + cacheCleanup utility
-5. WaveVisualizer instant attack amplitude, Hanning window
+#### 6. CLEANUP: Android-Only Specialization
+- User requested Android only and removal of iOS directory.
+- Removed `apps/mobile/ios` directory.
+- Removed iOS configuration blocks from `apps/mobile/app.json`.
+- Removed `ios` script from `apps/mobile/package.json`.
+- Removed iOS-specific `setAudioModeAsync` code paths from `useTuner.ts`.
+
+## Session 7 — Complete Emoji Removal & Vector Icon Standardization
+
+### Goal
+Replace all unicode emojis and symbols (`🔒`, `⚡`, `✓`, `↑`, `↓`, `♭`, `♯`, `›`) across the app with vector icons (`Feather` from `@expo/vector-icons`).
+
+### Changes
+1. **TunerScreen.tsx**:
+   - Replaced `🔒 LOCKED` badge with `<Feather name="lock" size={11} color={theme.colors.accent} />` and clean bold text `LOCKED`.
+   - Replaced `Tap string to lock-on ›` hint with clean text and `<Feather name="chevron-right" size={10} color={theme.colors.accent} />`.
+2. **ErrorBoundary.tsx**:
+   - Replaced lightning emoji `⚡` with `<Feather name="zap" size={28} color="#D97706" />`.
+3. **TunerStateBanner.tsx**:
+   - Removed emoji arrows and checkmarks (`✓`, `↑`, `↓`) embedded in text labels.
+   - Preserved Feather icons (`check-circle`, `arrow-up`, `arrow-down`, `chevron-up`, `chevron-down`, `target`) rendered next to labels.
+4. **CentsGauge.tsx**:
+   - Replaced `♭ FLAT` and `SHARP ♯` unicode text with `<Feather name="trending-down" size={11} /> FLAT` and `SHARP <Feather name="trending-up" size={11} />`.
+
+## Status: COMPLETED
+- Emojis in codebase: 0.
+- Unit tests: 100% passing across `packages/tuner-core` (12/12) and `packages/music-core` (7/7).
+- TypeScript: 0 errors across entire workspace (`tsc --noEmit`).

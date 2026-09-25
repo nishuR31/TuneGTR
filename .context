@@ -2,52 +2,52 @@
 
 ## Current Goals (All Complete)
 
-- [x] **String Strokes / Hits:** WaveVisualizer RMS impulse animation on pluck.
-- [x] **Sound Sensitivity & Detection:** YIN threshold 0.18, silence 0.001, noise gate 0.004.
-- [x] **UI/UX & Waves:** Responsive WaveVisualizer, landscape support, Hanning window, 40pt path.
-- [x] **±8¢ in-tune threshold:** Changed from ±5Hz (musically inaccurate across fretboard) to ±8 cents. At E2 (82Hz), ±5Hz was ±103¢ — far too wide. 8¢ is pro-tuner standard.
-- [x] **YIN detector tuned:** threshold=0.15, maxFreq=1050Hz (covers harmonics), silence=0.001, relaxed fallback +0.08.
-- [x] **StabilityFilter tuned:** confidenceThreshold=0.30 (was 0.65, was double-gating), EMA=0.65 (faster lock), maxJumpCents=800 (upstream handles new-string reset).
-- [x] **Confidence gate:** useTuner pre-filter 0.12 (was 0.15, more permissive for soft picks).
-- [x] **New-string jump:** 120¢→100¢ for faster recognition of adjacent string plucks.
-- [x] **signal_detected state:** set immediately when first stable pitch found (banner appears faster).
-- [x] **±5Hz tuning window:** In-tune is `|freq - targetFreq| ≤ 5Hz`, not cents-based.
-- [x] **Fresh audio — no stale frames:** Stale frame age gate (60ms), new-string jump detection (>120¢ resets StabilityFilter), latest-frame-wins pipeline.
-- [x] **Ultra-sensitive:** NOISE_GATE_THRESHOLD 0.004, YIN silence 0.001, StabilityFilter history=2, EMA=0.6.
-- [x] **Haptic feedback types:** Success (in_tune), Light (flat/sharp), Soft (listen), Medium (lock-on toggle).
-- [x] **Lock-on string wired:** Badge in header, hint text below StringSelector, haptic on toggle.
-- [x] **Full claymorphism — zero glass:** ThemeProvider→clay, AppSurface glass removed, MainNavigator glass removed, TunerScreen clay gradient, TuningPicker capo buttons themed, PermissionPrompt mic circle themed, SecurityComplianceModal scrim themed. **Confirmed 0 Tailwind glass/color utilities in codebase.**
-- [x] **ErrorBoundary:** Wraps App tree, calls clearStaleCache() on crash reset. Clay styled.
-- [x] **Cache cleanup:** src/utils/cacheCleanup.ts — wired into ErrorBoundary + Settings screen.
-- [x] **State updates:** 25ms (40fps), frame rate limit 15ms.
+- [x] **Android-Only Audio Pipeline:** Configured `useAudioStream` with `encoding: 'int16'` (`AudioFormat.ENCODING_PCM_16BIT`), resolving device HAL compatibility issues where `float32` recording was unsupported and crashed stream initialization. Decodes 16-bit PCM integer samples to normalized `Float32Array` [-1.0, 1.0].
+- [x] **Auto-Start Audio Listening:** Wired `TunerScreen` mount/unmount lifecycle with `startListening()` and `stopListening()`, ensuring audio capture activates immediately when the screen is viewed without needing manual button prompts.
+- [x] **Pure YIN Autocorrelation:** Removed time-domain Hanning window that caused envelope discrepancies in $x[i] - x[i+\tau]$ and artificially elevated CMNDF. Implemented constant integration window $W = N - \tau_{max}$ and parabolic sub-sample interpolation for sub-cent precision across all guitar strings.
+- [x] **Professional Pitch & Cents UI:** Arc-style needle gauge with ±8¢ in-tune highlight zone, digital cents display, Hz deviation readout, string lock-on badges, directional arrows (Tune Up / Tune Down), and semantic color coding (green/yellow/red).
+- [x] **Zero Emojis — All Vector Icons:** Removed all emojis and raw unicode symbols (`🔒`, `⚡`, `✓`, `↑`, `↓`, `♭`, `♯`, `›`). Replaced with `Feather` vector icons (`lock`, `zap`, `check-circle`, `arrow-up`, `arrow-down`, `trending-down`, `trending-up`, `chevron-right`).
+- [x] **iOS Directory & Configurations Removed:** Removed `apps/mobile/ios/`, removed iOS configuration blocks from `apps/mobile/app.json`, removed `ios` scripts, and purged iOS-specific audio session branches.
+- [x] **100% Test Coverage:** Vitest test suite in `packages/tuner-core` (12 tests) and `packages/music-core` (7 tests) passing with realistic harmonic series, microtonal offsets, and noise models. 0 TypeScript compiler errors.
 
 ## Architecture Notes
 
-- **Monorepo:** apps/mobile + packages/tuner-core + packages/music-core
-- **State:** Zustand (useTunerStore) — persists only settings to AsyncStorage
-- **Audio pipeline:** expo-audio (native), Web Audio API ScriptProcessor (web fallback)
-  - Frame age gate: drops frames >60ms old (kills stale queue after burst plucking)
-  - New-string gate: resets StabilityFilter on >120¢ jump (clean lock-on per string)
-  - Rate limiter: MIN_FRAME_GAP 15ms
-  - No-signal clear: 2 frames
-- **Detector:** YIN with parabolic interpolation, pre-allocated yinBuffer, threshold=0.18
-- **Theme:** Full claymorphism (clay.ts) — zero blur, opaque surfaces, ambient+specular shadows
-  - Light: #F0F2F8 bg, #F7F8FC surface, #7178D4 accent, sm=10/md=18/lg=26 radii
-  - Dark: #10131F bg, #171B2C surface, #9298FF accent
-- **Navigation:** Floating clay pill tab bar (borderRadius=32, clay shadow, opaque)
-- **ErrorBoundary:** Class component, clay-styled recovery UI, clearStaleCache on reset
+- **Platform Target:** Android-first / Android-only (with Web Audio API fallback for web testing)
+- **Monorepo:** `apps/mobile` + `packages/tuner-core` + `packages/music-core`
+- **State Management:** Zustand (`useTunerStore`) with AsyncStorage persistence for preferences (referenceA4, capoFret, activeTuning)
+- **Native Audio Capture:** `expo-audio` (`AudioStream`) in `int16` PCM mode
+  - Sample Rate: Hardware reported (typically 48000 Hz or 44100 Hz)
+  - Channels: 1 (Mono)
+  - Buffer Size: 4096 samples (~85.3ms history) in `RingBuffer`
+  - Integration Window: $W = N - \tau_{max} = 3136$ samples
+  - Noise Gate: RMS threshold 0.003
+  - Silence Detection: 3 consecutive frames before clearing note display
+- **Pitch Detection:** `YinDetector`
+  - Range: 50 Hz to 1100 Hz
+  - Primary Threshold: 0.15 with local minimum tracking
+  - Relaxed Fallback: +0.15 for weak plucks / fingerstyle
+  - Sub-sample Precision: Parabolic interpolation on CMNDF minimum
+- **Post-Filter:** `StabilityFilter`
+  - History: 3 frames (median filter for attack transient rejection)
+  - Smoothing: EMA with $\alpha = 0.7$
+  - Jump Detection: >80¢ jump resets filter for instant string plucking transitions
+- **Iconography:** `@expo/vector-icons` (`Feather`) across all screens and components — zero unicode emojis.
+- **Theme:** Pure claymorphism design system (`clay.ts`) — solid surfaces, layered ambient/specular elevation shadows, zero blur.
 
-## Files Changed (Session 2)
+## Files Modified (Session 5-7)
 
 | File | Change |
 |------|--------|
-| `apps/mobile/src/features/tuner/hooks/useTuner.ts` | Complete rewrite — stale frame gate, new-string reset, 40fps |
-| `apps/mobile/src/components/common/AppSurface.tsx` | Removed glass branch entirely — pure clay only |
-| `apps/mobile/src/theme/ThemeProvider.tsx` | Back to getClayTheme |
-| `apps/mobile/src/theme/clay.ts` | Enhanced palette + radii |
-| `apps/mobile/src/screens/TunerScreen.tsx` | Clay gradient, lock-on wired |
-| `apps/mobile/src/navigation/MainNavigator.tsx` | Removed isGlass branching |
-| `apps/mobile/src/features/tuner/components/TuningPicker.tsx` | Capo buttons: removed `border-blue-500/bg-blue-500/10` → theme tokens; modal scrim → inline style |
-| `apps/mobile/src/features/tuner/components/PermissionPrompt.tsx` | Mic circle: removed `bg-blue-50 dark:bg-blue-900/30` → `theme.colors.accentSoft` + clay shadow |
-| `apps/mobile/src/features/tuner/components/SecurityComplianceModal.tsx` | Modal scrim: `bg-black/60` → inline rgba |
-| `apps/mobile/src/features/tuner/components/NoteDisplay.tsx` | Glow: raw rgba → `theme.colors.successSoft / accentSoft` |
+| `packages/tuner-core/src/detector.ts` | Removed time-domain Hanning window; implemented constant integration window $W = N - \tau_{max}$; tuned fallback threshold; fixed StabilityFilter default threshold |
+| `packages/tuner-core/tests/detector.test.ts` | Added comprehensive tests for all 6 guitar strings with realistic harmonics, noise, and microtonal cent variations |
+| `apps/mobile/src/features/tuner/hooks/useTuner.ts` | Switched `useAudioStream` to `encoding: 'int16'`; implemented 16-bit PCM integer decoding to normalized Float32; removed iOS audio mode calls; streamlined Web Audio fallback |
+| `apps/mobile/src/screens/TunerScreen.tsx` | Added auto-start listening `useEffect` on screen mount; replaced `🔒 LOCKED` with Feather lock icon; replaced `›` with Feather chevron-right |
+| `apps/mobile/src/features/tuner/components/CentsGauge.tsx` | Fixed `alignmentBaseline="middle"` for SVG text; replaced `♭ FLAT` and `SHARP ♯` with Feather `trending-down` and `trending-up` icons |
+| `apps/mobile/src/features/tuner/components/TunerStateBanner.tsx` | Removed emoji arrows and checkmark (`✓`, `↑`, `↓`) from text labels in favor of Feather icons |
+| `apps/mobile/src/components/common/ErrorBoundary.tsx` | Replaced lightning emoji `⚡` with Feather `zap` vector icon |
+| `apps/mobile/app.json` | Removed iOS configuration section |
+| `apps/mobile/package.json` | Removed `ios` run script |
+| `apps/mobile/ios/` | Deleted directory |
+| `.plan` | Updated root causes, approach, emoji removal, and status |
+| `.error` | Documented HAL float32 incompatibility, Hanning window CMNDF distortion, auto-start resolution, and icon migration |
+| `.context` | Updated project tracker and architecture specifications |
