@@ -122,7 +122,7 @@ export function TunerScreen() {
       <View className={`flex-1 ${layout.isLandscape ? "flex-row" : "flex-col"}`}>
 
         {/* ── Top / Left ── */}
-        <View className={`${layout.isLandscape ? "flex-1" : "flex-[1.5]"}`}>
+        <View className={`${layout.isLandscape ? "flex-1" : "flex-1"}`}>
 
           {/* Header */}
           <View
@@ -201,7 +201,7 @@ export function TunerScreen() {
 
         {/* ── Bottom / Right ── */}
         <View
-          className="flex-1"
+          className="flex-[1.2]"
           style={{
             justifyContent: layout.isLandscape ? "center" : "flex-end",
             paddingBottom: layout.isLandscape ? 0 : layout.insets.bottom + 90,
@@ -215,7 +215,7 @@ export function TunerScreen() {
           </View>
 
           {/* Cents Gauge */}
-          <View className="flex-1 shrink justify-center min-h-[160px] px-6">
+          <View className="justify-center items-center px-6">
             <CentsGauge />
           </View>
 
