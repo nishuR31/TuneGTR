@@ -29,8 +29,10 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-foreground-light.png",
-        "backgroundColor": "#ffffff",
-        "monochromeImage": "./assets/adaptive-foreground-dark.png"
+        "backgroundColor": "#FFFFFF",
+        "monochromeImage": "./assets/adaptive-foreground-dark.png",
+        "darkForegroundImage": "./assets/adaptive-foreground-dark.png",
+        "darkBackgroundColor": "#111522"
       },
       "package": "com.guitartool.tuner",
       "permissions": [
