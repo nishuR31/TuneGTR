@@ -89,7 +89,7 @@ export const TunerStateBanner: React.FC = () => {
   if (!config.label) return null;
 
   return (
-    <AppSurface level="raised" className="px-4 py-3 rounded-[16px] w-full max-w-[340px] items-center" style={{ backgroundColor: theme.mode === 'light' ? theme.colors.surface : theme.colors.surfaceElevated }}>
+    <AppSurface level="raised" className="px-4 py-3 rounded-[16px] w-full max-w-[340px] items-center" style={{ backgroundColor: theme.mode === 'light' ? theme.colors.surface : theme.colors.surfaceRaised }}>
       {/* Direction arrow + label row */}
       <View style={styles.directionRow}>
         <Feather name={config.icon} size={22} color={config.iconColor} style={{ marginRight: 8 }} />
