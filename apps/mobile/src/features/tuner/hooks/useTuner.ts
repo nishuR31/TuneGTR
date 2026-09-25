@@ -174,15 +174,12 @@ export const useTuner = () => {
           referenceA4,
         );
 
-        // Auto-detect fallback if locked string is way off
-        if (nearest && state.manualStringPosition > 0 && Math.abs(nearest.cents) > 400) {
-          nearest = findNearestString(frequency, adjustedStrings, referenceA4);
-        }
-
         if (!nearest) return;
 
         const cents = getCents(frequency, nearest.targetFrequency);
-        if (Math.abs(cents) > 350) return;
+        // Allow wider range when locked on (1200 cents = 1 octave) vs auto-detect (350 cents)
+        const maxCentsOff = state.manualStringPosition > 0 ? 1200 : 350;
+        if (Math.abs(cents) > maxCentsOff) return;
 
         const midi = getMidi(frequency, referenceA4);
         const noteName = getPitchClass(midi);

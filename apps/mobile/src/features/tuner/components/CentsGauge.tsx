@@ -292,7 +292,7 @@ const styles = StyleSheet.create({
   readoutRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 10,
+    marginTop: 28, // Increased from 10 to clear the 20px offset of the needle pivot
     width: '100%',
     paddingHorizontal: 16,
     justifyContent: 'center',

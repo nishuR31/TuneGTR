@@ -56,3 +56,8 @@
 - [x] **Infinite Render Loop Fix:** Fixed "Maximum update depth exceeded" error by decoupling `useTunerStore()` subscriptions across the app. Components like `TunerScreen`, `StringSelector`, `WaveVisualizer`, etc., were subscribing to the entire Zustand store, causing them (and their children) to re-render 40 times a second whenever audio pitch data (cents, frequency) changed.
 - [x] **Store Selector Optimization:** Refactored `useTunerStore()` usage to explicitly select only the necessary state properties (e.g., `useTunerStore((s) => s.tunerState)`), drastically reducing unnecessary re-renders.
 - [x] **Hook Optimization:** Replaced store dependency inside `useTuner` with `useTunerStore.getState()` for internal audio callbacks (`processSamples`) to prevent the audio hook from continually recreating itself and triggering infinite loops during state dispatch.
+
+## String Lock-On Enhancement (Session 8)
+- [x] **Strict Target Enforcement:** Modified `useTuner.ts` so that when a specific string is manually locked, the tuner will strictly evaluate against that string's target frequency. Removed the 400-cent fallback that previously allowed it to auto-detect other strings if the note was way off.
+- [x] **Extended Tolerance:** Increased the lock-on recognition window from 350 cents to 1200 cents (1 octave). If a user locks a string, they want to tune it even if it's wildly out of tune.
+- [x] **Visual Muting:** Updated `StringSelector.tsx` to visually dim/mute (opacity 0.35) all other string letters when one is actively locked, making it completely obvious to the user which string is currently locked and ignoring other inputs.

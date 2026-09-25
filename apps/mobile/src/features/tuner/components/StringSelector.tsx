@@ -20,8 +20,10 @@ const StringKey = React.memo(({
   onLongPress,
   width,
   height,
+  isMuted,
 }: { 
   isSelected: boolean;
+  isMuted: boolean;
   note: string;
   position: number;
   midi: number;
@@ -63,6 +65,7 @@ const StringKey = React.memo(({
             backgroundColor: isSelected ? (theme.mode === 'light' ? theme.colors.surfaceRaised : theme.colors.accentSoft) : theme.colors.surface,
             borderColor: isSelected ? theme.colors.border : 'transparent',
             borderWidth: 1,
+            opacity: isMuted ? 0.35 : 1, // Mute visual opacity if another string is locked
           }}
         >
           <AppText
@@ -134,12 +137,14 @@ export const StringSelector: React.FC = () => {
       <View className="flex-row justify-center" style={{ gap }}>
         {strings.map((s) => {
           const isSelected = isActive && s.position === activePosition;
+          const isMuted = manualStringPosition > 0 && manualStringPosition !== s.position;
           const noteLabel = s.note.replace(/[0-9]/g, "");
 
           return (
             <StringKey
               key={s.position}
               isSelected={isSelected}
+              isMuted={isMuted}
               note={noteLabel}
               position={s.position}
               midi={s.midi}

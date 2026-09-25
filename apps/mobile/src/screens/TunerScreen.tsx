@@ -204,7 +204,7 @@ export function TunerScreen() {
           className="flex-1"
           style={{
             justifyContent: layout.isLandscape ? "center" : "flex-end",
-            paddingBottom: layout.isLandscape ? 0 : layout.insets.bottom + 110,
+            paddingBottom: layout.isLandscape ? 0 : layout.insets.bottom + 90,
             paddingTop: layout.isLandscape ? layout.insets.top + 24 : 0,
           }}
         >
@@ -215,7 +215,7 @@ export function TunerScreen() {
           </View>
 
           {/* Cents Gauge */}
-          <View className="flex-1 shrink justify-center min-h-[50px] px-6">
+          <View className="flex-1 shrink justify-center min-h-[160px] px-6">
             <CentsGauge />
           </View>
 
