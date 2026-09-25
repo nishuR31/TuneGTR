@@ -80,8 +80,8 @@ export const CentsGauge: React.FC = () => {
   const gaugeW = Math.min(screenWidth - 40, 320);
   const gaugeH = gaugeW * 0.52;
   const cx = gaugeW / 2;
-  // Pivot point: place it lower than the visible SVG area so the arc appears above
-  const cy = gaugeH + 20;
+  // Pivot point: place it at the gauge baseline
+  const cy = gaugeH;
   const outerR = gaugeW * 0.44;
   const innerR = outerR * 0.76;
   const trackR = (outerR + innerR) / 2;
@@ -136,10 +136,10 @@ export const CentsGauge: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      {/* Arc gauge — SVG with overflow visible so needle below gauge height shows */}
+      {/* Arc gauge */}
       <Svg
         width={gaugeW}
-        height={gaugeH}
+        height={gaugeH + 12} // Add space for the needle pivot radius
         style={{ overflow: 'visible' }}
       >
         {/* Background track arc */}
@@ -292,7 +292,7 @@ const styles = StyleSheet.create({
   readoutRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 28, // Increased from 10 to clear the 20px offset of the needle pivot
+    marginTop: 4,
     width: '100%',
     paddingHorizontal: 16,
     justifyContent: 'center',
