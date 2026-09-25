@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import {
   View,
-  TouchableOpacity,
+  Pressable,
   StyleSheet,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
@@ -162,12 +162,11 @@ export function TunerScreen() {
             style={{ paddingBottom: layout.isLandscape ? 24 : 0 }}
           >
             <Animated.View style={[{ width: '100%', alignItems: 'center' }, animatedButtonStyle]}>
-              <TouchableOpacity
+              <Pressable
                 className="w-full items-center"
                 onPress={isListening ? stopListening : startListening}
                 onPressIn={handlePressIn}
                 onPressOut={handlePressOut}
-                activeOpacity={1}
               >
                 <AppSurface 
                   level={isListening ? 'base' : 'raised'} 
@@ -185,7 +184,7 @@ export function TunerScreen() {
                     {isListening ? "Stop Tuning" : "Start Tuning"}
                   </AppText>
                 </AppSurface>
-              </TouchableOpacity>
+              </Pressable>
             </Animated.View>
           </View>
         </View>

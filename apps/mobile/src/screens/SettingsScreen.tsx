@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, Switch, TouchableOpacity, NativeModules, Platform, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useThemeStore } from '../theme/themeStore';
 import { useTheme } from '../theme/ThemeProvider';
 import { useTunerStore } from '../features/tuner/store/tunerStore';
 import { AppSurface } from '../components/common/AppSurface';
@@ -15,7 +14,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const CAPO_FRETS = Array.from({ length: 13 }, (_, i) => i); // 0-12
 
 export function SettingsScreen() {
-  const { mode, base, setMode, setBase } = useThemeStore();
   const { clearPitchData, referenceA4, setReferenceA4, capoFret, setCapoFret } = useTunerStore();
   const theme = useTheme();
   const insets = useSafeAreaInsets();
@@ -136,36 +134,7 @@ export function SettingsScreen() {
         </ScrollView>
       </AppSurface>
 
-      {/* ─── Appearance Section ─── */}
-      <AppText variant="caption" color="muted" style={[styles.sectionLabel, { paddingHorizontal: theme.spacing.lg, marginTop: theme.spacing.xl, marginBottom: theme.spacing.xs }]}>
-        APPEARANCE
-      </AppText>
-      <AppSurface isCard level="elevated" style={[styles.card, { padding: theme.spacing.md, marginHorizontal: theme.spacing.lg }]}>
-        <View style={[styles.row, { paddingVertical: theme.spacing.sm }]}>
-          <AppText variant="body" style={{ fontWeight: '500' }}>Dark Mode</AppText>
-          <Switch 
-            value={mode === 'dark'} 
-            onValueChange={(val) => setMode(val ? 'dark' : 'light')} 
-            trackColor={{ true: theme.colors.accent, false: theme.colors.border }}
-          />
-        </View>
 
-        <View style={[styles.divider, { backgroundColor: theme.colors.border, marginVertical: theme.spacing.xs }]} />
-
-        <View style={[styles.row, { paddingVertical: theme.spacing.sm }]}>
-          <View style={{ flex: 1 }}>
-            <AppText variant="body" style={{ fontWeight: '500' }}>Glass Theme</AppText>
-            <AppText variant="caption" color="muted" style={{ marginTop: 2 }}>
-              Translucent surfaces with light borders.
-            </AppText>
-          </View>
-          <Switch 
-            value={base === 'glass'} 
-            onValueChange={(val) => setBase(val ? 'glass' : 'clay')}
-            trackColor={{ true: theme.colors.accent, false: theme.colors.border }}
-          />
-        </View>
-      </AppSurface>
 
       {/* ─── Privacy & Security Section ─── */}
       <AppText variant="caption" color="muted" style={[styles.sectionLabel, { paddingHorizontal: theme.spacing.lg, marginTop: theme.spacing.xl, marginBottom: theme.spacing.xs }]}>
