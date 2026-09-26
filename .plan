@@ -70,3 +70,18 @@ YIN's CMNDF minimum on wound strings (D3, A2, E2) often lands at the 2nd-harmoni
 - TS type: `let nearest: ReturnType<typeof findNearestString>` — correctly inferred as the nullable struct.
 
 ### Status: COMPLETE — 0 TS errors
+
+## Session 10 — Bun Monorepo Metro Resolution Fix (Android Build)
+
+### Root Cause
+Android release build (`createBundleReleaseJsAndAssets`) failed with cascading `Cannot find module` errors for `babel-preset-expo`, `@babel/plugin-transform-react-jsx`, `expo-asset`, `react-native-css-interop`, `invariant`, etc.
+
+**Why:** `metro.config.js` had `disableHierarchicalLookup = true` and only listed two `nodeModulesPaths`. Bun's workspace manager installs packages into a content-addressed store at `node_modules/.bun/<pkg>@version+hash/node_modules/`, nesting each package's transitive dependencies inside that directory. With hierarchical lookup disabled, Metro could only resolve packages that were directly symlinked at the top level — it could never traverse into `.bun/` subdirectories to find transitive deps like `invariant` (a dep of `react-native`).
+
+### Fix (metro.config.js)
+1. **Removed** `disableHierarchicalLookup = true` — allows Metro to walk up the `node_modules` tree naturally, following Bun's symlink → `.bun/` store → nested `node_modules/` structure.
+2. **Added** `.bun` store directory to `nodeModulesPaths` — `path.resolve(workspaceRoot, 'node_modules', '.bun')` gives Metro direct visibility into Bun's content-addressed store.
+3. **Added** `unstable_enablePackageExports = true` — enables `package.json` `"exports"` field resolution, required by modern packages like `react-native-css-interop/jsx-runtime`.
+4. **Explicitly added** missing direct dependencies to `apps/mobile/package.json`: `babel-preset-expo`, `@babel/plugin-transform-react-jsx`, `expo-asset`, `expo-constants`, `expo-file-system`, `expo-font`, `expo-keep-awake`, `react-native-css-interop`.
+
+### Status: IN PROGRESS — awaiting build verification

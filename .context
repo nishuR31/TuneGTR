@@ -66,3 +66,9 @@
 - [x] **Root cause identified:** YIN locks onto the 2nd harmonic (2× fundamental) for wound strings 4 (D3), 5 (A2), 6 (E2), causing the tuner to report the wrong pitch direction.
 - [x] **Fix in `useTuner.ts` `processSamples`:** Harmonic candidate evaluation — after the StabilityFilter yields `rawFrequency`, both `rawFrequency` and `rawFrequency/2` (floored at 60 Hz) are passed to `findNearestString`. The candidate with the smallest `|cents|` offset wins and is used for all display (cents gauge, note name, string badge). `lastPublishedFreq` tracks `rawFrequency` (not the corrected value) to keep the existing >80¢ jump-detection logic intact.
 - [x] **TypeScript:** 0 compiler errors after change.
+
+## Session 10 — Android Build Fix (Bun + Metro Module Resolution)
+- [x] **Root cause identified:** `metro.config.js` had `disableHierarchicalLookup = true`, preventing Metro from resolving transitive dependencies stored in Bun's `.bun/` content-addressed store.
+- [x] **Metro config rewritten:** Removed `disableHierarchicalLookup`, added `.bun` store to `nodeModulesPaths`, enabled `unstable_enablePackageExports`.
+- [x] **Missing direct deps added:** `babel-preset-expo`, `@babel/plugin-transform-react-jsx`, `expo-asset`, `expo-constants`, `expo-file-system`, `expo-font`, `expo-keep-awake`, `react-native-css-interop`.
+- [ ] **Build verification:** Awaiting Android release build confirmation.
