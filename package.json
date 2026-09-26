@@ -11,5 +11,8 @@
     "dev": "bun run start --workspace=mobile",
     "start": "bun run start --workspace=mobile",
     "test": "bun run test --workspaces"
+  },
+  "dependencies": {
+    "expo-asset": "^57.0.18"
   }
 }
