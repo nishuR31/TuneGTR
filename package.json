@@ -13,6 +13,7 @@
     "test": "bun run test --workspaces"
   },
   "dependencies": {
-    "expo-asset": "^57.0.18"
+    "expo-asset": "^57.0.18",
+    "react-native-css-interop": "^0.2.7"
   }
 }
