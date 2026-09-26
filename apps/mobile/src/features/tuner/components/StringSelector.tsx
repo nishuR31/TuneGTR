@@ -5,7 +5,7 @@ import { useTheme } from "../../../theme/ThemeProvider";
 import { AppSurface } from "../../../components/common/AppSurface";
 import { AppText } from "../../../components/common/AppText";
 import { useLayout } from "../../../hooks/useLayout";
-import { getTargetFrequency } from "@guitar-tool/music-core";
+import { getTargetFrequency } from "@tunergtr/music-core";
 import { playReferenceTone, isReferenceToneSupported } from "../utils/toneGenerator";
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 

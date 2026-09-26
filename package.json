@@ -1,8 +1,8 @@
 {
-  "name": "guitar-tool-monorepo",
+  "name": "tunergtr-monorepo",
   "version": "1.0.0",
   "private": true,
-  "description": "Guitar Tuner Monorepo",
+  "description": "TunerGTR Monorepo",
   "workspaces": [
     "apps/*",
     "packages/*"

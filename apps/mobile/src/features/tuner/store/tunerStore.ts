@@ -1,8 +1,8 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import type { TuningDefinition } from "@guitar-tool/music-core";
-import { TUNINGS } from "@guitar-tool/music-core";
+import type { TuningDefinition } from "@tunergtr/music-core";
+import { TUNINGS } from "@tunergtr/music-core";
 
 // ─── Tuner State Machine (Section 13 of design plan) ────────────────────────
 

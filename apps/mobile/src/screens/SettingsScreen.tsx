@@ -229,7 +229,7 @@ export function SettingsScreen() {
 
       {/* Version info */}
       <AppText variant="caption" color="muted" style={{ textAlign: 'center', marginTop: theme.spacing.xl }}>
-        Guitar Tuner v0.1.0
+        TunerGTR v0.1.0
       </AppText>
 
       <SecurityComplianceModal 

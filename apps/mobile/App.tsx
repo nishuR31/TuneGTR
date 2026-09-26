@@ -8,7 +8,7 @@ import { Toaster } from 'sonner-native';
 import { ErrorBoundary } from './src/components/common/ErrorBoundary';
 
 /**
- * Guitar Tuner — Main Application
+ * TunerGTR — Main Application
  * Wrapped in ThemeProvider for contextual design tokens.
  * ErrorBoundary catches and recovers from render errors with cache cleanup.
  */

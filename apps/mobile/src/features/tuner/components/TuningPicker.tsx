@@ -8,7 +8,7 @@ import {
   Pressable,
 } from "react-native";
 import { useTunerStore } from "../store/tunerStore";
-import { TUNINGS, type TuningDefinition } from "@guitar-tool/music-core";
+import { TUNINGS, type TuningDefinition } from "@tunergtr/music-core";
 import { AppSurface } from "../../../components/common/AppSurface";
 import { AppText } from "../../../components/common/AppText";
 import { useTheme } from "../../../theme/ThemeProvider";

@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Guitar Tuner",
-    "slug": "guitar-tuner",
+    "name": "TunerGTR",
+    "slug": "tunergtr",
     "version": "0.1.0",
     "orientation": "portrait",
     "icon": "./assets/icon-light.png",
@@ -10,7 +10,7 @@
       [
         "expo-audio",
         {
-          "microphonePermission": "Guitar Tuner needs microphone access to detect the pitch of your guitar strings. Audio is processed locally and never recorded or uploaded."
+          "microphonePermission": "TunerGTR needs microphone access to detect the pitch of your guitar strings. Audio is processed locally and never recorded or uploaded."
         }
       ]
     ],
@@ -23,7 +23,7 @@
         "darkForegroundImage": "./assets/adaptive-foreground-dark.png",
         "darkBackgroundColor": "#111522"
       },
-      "package": "com.guitartool.tuner",
+      "package": "com.tunergtr.tuner",
       "permissions": [
         "RECORD_AUDIO"
       ]

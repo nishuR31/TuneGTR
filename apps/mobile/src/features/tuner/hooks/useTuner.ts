@@ -4,15 +4,16 @@ import {
   getRecordingPermissionsAsync,
   useAudioStream,
 } from "expo-audio";
+import { Audio } from "expo-av";
 import { Platform } from "react-native";
-import { YinDetector, StabilityFilter, RingBuffer } from "@guitar-tool/tuner-core";
+import { YinDetector, StabilityFilter, RingBuffer } from "@tunergtr/tuner-core";
 import {
   getMidi,
   getCents,
   getNoteName,
   getPitchClass,
   findNearestString,
-} from "@guitar-tool/music-core";
+} from "@tunergtr/music-core";
 import { useTunerStore } from "../store/tunerStore";
 import { playReferenceTone } from "../utils/toneGenerator";
 
@@ -431,7 +432,20 @@ export const useTuner = () => {
 
       if (soundEnabled && tunerState === "in_tune") {
         try {
-          playReferenceTone(targetFrequency || 440, 200);
+          if (Platform.OS === 'web') {
+            playReferenceTone(targetFrequency || 440, 200);
+          } else {
+            // Play native ding sound
+            Audio.Sound.createAsync(require('../../../../assets/ding.wav'), { shouldPlay: true })
+              .then(({ sound }) => {
+                sound.setOnPlaybackStatusUpdate((status) => {
+                  if (status.isLoaded && status.didJustFinish) {
+                    sound.unloadAsync();
+                  }
+                });
+              })
+              .catch(() => {});
+          }
         } catch (e) {
           // ignore
         }

@@ -1,5 +1,5 @@
 {
-  "name": "@guitar-tool/tuner-core",
+  "name": "@tunergtr/tuner-core",
   "version": "1.0.0",
   "main": "src/index.ts",
   "types": "src/index.ts",
@@ -11,6 +11,6 @@
     "vitest": "^1.0.0"
   },
   "dependencies": {
-    "@guitar-tool/music-core": "*"
+    "@tunergtr/music-core": "*"
   }
 }
