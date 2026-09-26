@@ -61,3 +61,8 @@
 - [x] **Strict Target Enforcement:** Modified `useTuner.ts` so that when a specific string is manually locked, the tuner will strictly evaluate against that string's target frequency. Removed the 400-cent fallback that previously allowed it to auto-detect other strings if the note was way off.
 - [x] **Extended Tolerance:** Increased the lock-on recognition window from 350 cents to 1200 cents (1 octave). If a user locks a string, they want to tune it even if it's wildly out of tune.
 - [x] **Visual Muting:** Updated `StringSelector.tsx` to visually dim/mute (opacity 0.35) all other string letters when one is actively locked, making it completely obvious to the user which string is currently locked and ignoring other inputs.
+
+## Session 9 — Low-String Harmonic Correction
+- [x] **Root cause identified:** YIN locks onto the 2nd harmonic (2× fundamental) for wound strings 4 (D3), 5 (A2), 6 (E2), causing the tuner to report the wrong pitch direction.
+- [x] **Fix in `useTuner.ts` `processSamples`:** Harmonic candidate evaluation — after the StabilityFilter yields `rawFrequency`, both `rawFrequency` and `rawFrequency/2` (floored at 60 Hz) are passed to `findNearestString`. The candidate with the smallest `|cents|` offset wins and is used for all display (cents gauge, note name, string badge). `lastPublishedFreq` tracks `rawFrequency` (not the corrected value) to keep the existing >80¢ jump-detection logic intact.
+- [x] **TypeScript:** 0 compiler errors after change.

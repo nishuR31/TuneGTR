@@ -149,7 +149,7 @@ export const useTuner = () => {
         const stable = stabilityFilter.process(raw);
         if (!stable) return;
 
-        const { frequency, confidence } = stable;
+        const { frequency: rawFrequency, confidence } = stable;
         const referenceA4 = state.referenceA4;
         const capoFret = state.capoFret;
         const tuningStrings = state.activeTuning.stringsLowToHigh;
@@ -168,11 +168,38 @@ export const useTuner = () => {
           ? adjustedStrings.filter((s) => s.position === state.manualStringPosition)
           : adjustedStrings;
 
-        let nearest = findNearestString(
-          frequency,
-          targetStrings.length > 0 ? targetStrings : adjustedStrings,
-          referenceA4,
-        );
+        const searchStrings = targetStrings.length > 0 ? targetStrings : adjustedStrings;
+
+        // ─── Harmonic correction ──────────────────────────────────────────────
+        // YIN pitch detection on wound low strings (4 = D3, 5 = A2, 6 = E2) often
+        // locks onto the 2nd harmonic (2× the fundamental) instead of the fundamental.
+        // This makes the tuner report the wrong pitch direction — e.g. "tune down" when
+        // the string is perfectly in tune or slightly sharp.
+        //
+        // Fix: also test f/2 as a candidate and pick whichever frequency (f or f/2)
+        // has the smallest absolute cents distance to any target guitar string.
+        //
+        // Safety guard: only test f/2 when it is ≥ 60 Hz (covers the lowest guitar
+        // fundamental, E2 = 82.4 Hz), preventing phantom sub-bass matches.
+        const candidateFreqs: number[] = [rawFrequency];
+        if (rawFrequency / 2 >= 60) candidateFreqs.push(rawFrequency / 2);
+
+        let nearest: ReturnType<typeof findNearestString> = null;
+        let frequency = rawFrequency;
+        let nearestAbsCents = Infinity;
+
+        for (const f of candidateFreqs) {
+          const n = findNearestString(f, searchStrings, referenceA4);
+          if (n) {
+            const absCents = Math.abs(getCents(f, n.targetFrequency));
+            if (absCents < nearestAbsCents) {
+              nearestAbsCents = absCents;
+              nearest = n;
+              frequency = f;
+            }
+          }
+        }
+        // ─────────────────────────────────────────────────────────────────────
 
         if (!nearest) return;
 
@@ -185,7 +212,10 @@ export const useTuner = () => {
         const noteName = getPitchClass(midi);
         const octave = Math.floor(midi / 12) - 1;
 
-        lastPublishedFreq.current = frequency;
+        // Track raw (pre-correction) smoothed frequency so the jump-detection
+        // comparison above (raw.frequency vs lastPublishedFreq) stays consistent
+        // and won't spuriously reset the stability filter on every frame.
+        lastPublishedFreq.current = rawFrequency;
 
         // Switch to signal_detected if currently listening/idle
         if (state.tunerState === "listening" || state.tunerState === "no_signal") {

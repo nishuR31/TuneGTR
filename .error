@@ -64,3 +64,8 @@
 ### Session 7
 - **"Remove all emoji with icons"**
   Removed all unicode emojis/symbols (`🔒`, `⚡`, `✓`, `↑`, `↓`, `♭`, `♯`, `›`). Replaced with Feather vector icons (`lock`, `zap`, `check-circle`, `arrow-up`, `arrow-down`, `trending-down`, `trending-up`, `chevron-right`).
+
+### Session 9 — Low-String (4, 5, 6) Reporting Wrong Tune Direction
+- **Error (user-reported):** Strings 1–3 (G, B, E4) report correctly. Strings 4–6 (D, A, E2) report "tune up" or "tune down" even when the guitar is in tune. User example: "54 is tune down a bit."
+- **Root Cause:** YIN pitch detection on thick wound strings (4 = D3, 5 = A2, 6 = E2) frequently latches onto the **2nd harmonic** (2× the fundamental) instead of the fundamental. Because the 2nd harmonic is not a guitar string target, `findNearestString` matches it to the *closest* string, which introduces a systematic ~+200 cent offset that is displayed as "tune down."
+- **Resolution:** Added harmonic correction in `useTuner.ts` `processSamples`. After getting the stability-filtered frequency, both `f` and `f/2` are evaluated as candidates against all target strings. The one with the smallest absolute cents distance wins. The 60 Hz floor guard prevents phantom sub-bass matches. `lastPublishedFreq` is now set to the raw smoothed frequency (not the octave-corrected one) so the existing jump-detection logic (>80¢ → StabilityFilter reset) remains unaffected.

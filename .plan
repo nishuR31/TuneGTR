@@ -55,3 +55,18 @@ Replace all unicode emojis and symbols (`🔒`, `⚡`, `✓`, `↑`, `↓`, `♭
 - Emojis in codebase: 0.
 - Unit tests: 100% passing across `packages/tuner-core` (12/12) and `packages/music-core` (7/7).
 - TypeScript: 0 errors across entire workspace (`tsc --noEmit`).
+
+## Session 9 — Harmonic Correction for Low Strings (4, 5, 6)
+
+### Root Cause
+YIN's CMNDF minimum on wound strings (D3, A2, E2) often lands at the 2nd-harmonic lag (τ/2), yielding twice the true frequency. `findNearestString` then matches that doubled frequency to a "nearby" string and computes the wrong cents offset, causing the tuner to display "tune down" or "tune up" incorrectly.
+
+### Fix (useTuner.ts — processSamples)
+- After stability filter → `rawFrequency`.
+- Build candidate list `[rawFrequency, rawFrequency/2]` (f/2 only when ≥ 60 Hz).
+- Run `findNearestString` for each candidate; keep the one with the smallest `|cents|`.
+- Use the winning frequency and its nearest string for all display logic (cents gauge, note name, position badge).
+- `lastPublishedFreq` stores `rawFrequency` (not the corrected one) to preserve jump-detection semantics.
+- TS type: `let nearest: ReturnType<typeof findNearestString>` — correctly inferred as the nullable struct.
+
+### Status: COMPLETE — 0 TS errors
