@@ -33,7 +33,9 @@
     "zustand": "^5.0.0"
   },
   "devDependencies": {
+    "@babel/plugin-transform-react-jsx": "^7.0.0",
     "@types/react": "~19.2.2",
+    "babel-preset-expo": "*",
     "tailwindcss": "^3.3.2",
     "typescript": "~6.0.3"
   },
