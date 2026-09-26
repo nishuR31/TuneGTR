@@ -7,6 +7,11 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 bun.log
+ android/
+ .expo/
+ .claude/
+ node_modules/
+ 
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
@@ -43,6 +48,13 @@ build/Release
 node_modules/
 jspm_packages/
 
+# Local workspace and editor files
+.context
+.error
+.plan
+.claude/
+.vscode/
+
 # Snowpack dependency directory (https://snowpack.dev/)
 web_modules/
 
@@ -75,6 +87,8 @@ web_modules/
 
 # dotenv environment variable files
 .env
+.env.*
+!.env.example
 .env.test
 .env.production
 .env.local
@@ -136,6 +150,10 @@ web-build/
 android/
 ios/
 
-# Bun
-bun.lock
-bun.lockb
+# Build and generated output
+dist/
+build/
+coverage/
+
+# Bun local state
+.bun/
