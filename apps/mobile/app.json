@@ -14,7 +14,6 @@
         }
       ]
     ],
-
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-foreground-light.png",
@@ -25,7 +24,11 @@
       },
       "package": "com.tunergtr.tuner",
       "permissions": [
-        "RECORD_AUDIO"
+        "RECORD_AUDIO",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"
       ]
     },
     "web": {
@@ -39,6 +42,9 @@
         "image": "./assets/splash-dark.png",
         "backgroundColor": "#111522"
       }
+    },
+    "ios": {
+      "bundleIdentifier": "com.tunergtr.tuner"
     }
   }
 }

@@ -4,7 +4,6 @@ import {
   getRecordingPermissionsAsync,
   useAudioStream,
 } from "expo-audio";
-import { Audio } from "expo-av";
 import { Platform } from "react-native";
 import { YinDetector, StabilityFilter, RingBuffer } from "@tunergtr/tuner-core";
 import {
@@ -158,10 +157,10 @@ export const useTuner = () => {
         // Apply capo offset if present
         const adjustedStrings = capoFret > 0
           ? tuningStrings.map((s) => ({
-              ...s,
-              midi: s.midi + capoFret,
-              note: getNoteName(s.midi + capoFret),
-            }))
+            ...s,
+            midi: s.midi + capoFret,
+            note: getNoteName(s.midi + capoFret),
+          }))
           : tuningStrings;
 
         // Manual string lock filter
@@ -387,7 +386,7 @@ export const useTuner = () => {
         sourceNodeRef.current = null;
       }
       if (audioContextRef.current) {
-        audioContextRef.current.close().catch(() => {});
+        audioContextRef.current.close().catch(() => { });
         audioContextRef.current = null;
       }
       if (mediaStreamRef.current) {
@@ -420,31 +419,20 @@ export const useTuner = () => {
         import("expo-haptics")
           .then((Haptics) => {
             if (tunerState === "in_tune") {
-              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => { });
             } else if (tunerState === "flat" || tunerState === "sharp") {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => { });
             } else if (tunerState === "listening" || tunerState === "signal_detected") {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft).catch(() => {});
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft).catch(() => { });
             }
           })
-          .catch(() => {});
+          .catch(() => { });
       }
 
       if (soundEnabled && tunerState === "in_tune") {
         try {
           if (Platform.OS === 'web') {
             playReferenceTone(targetFrequency || 440, 200);
-          } else {
-            // Play native ding sound
-            Audio.Sound.createAsync(require('../../../../assets/ding.wav'), { shouldPlay: true })
-              .then(({ sound }) => {
-                sound.setOnPlaybackStatusUpdate((status) => {
-                  if (status.isLoaded && status.didJustFinish) {
-                    sound.unloadAsync();
-                  }
-                });
-              })
-              .catch(() => {});
           }
         } catch (e) {
           // ignore

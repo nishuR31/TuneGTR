@@ -6,7 +6,7 @@
 ![Zustand](https://img.shields.io/badge/Zustand-764ABC?style=for-the-badge&logo=react&logoColor=white)
 ![Bun](https://img.shields.io/badge/Bun-000000?style=for-the-badge&logo=bun&logoColor=white)
 
-A high-performance, real-time guitar tuner application built with React Native and Expo. It features a highly responsive UI, advanced pitch detection algorithms, and robust tuning capabilities for both standard and alternative tunings.
+A high-performance, real-time guitar tuner application — **TuneGTR** — built with React Native and Expo. It features a highly responsive UI, advanced pitch detection algorithms, and robust tuning capabilities for both standard and alternative tunings.
 
 ## ✨ Features
 
