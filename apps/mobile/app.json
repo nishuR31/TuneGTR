@@ -1,0 +1,51 @@
+{
+  "expo": {
+    "name": "TuneGTR",
+    "slug": "tunergtr",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon-dark.png",
+    "userInterfaceStyle": "dark",
+    "plugins": [
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "TuneGTR needs microphone access to detect the pitch of your guitar strings. Audio is processed locally and never recorded or uploaded."
+        }
+      ]
+    ],
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-foreground-dark.png",
+        "backgroundColor": "#070A14",
+        "monochromeImage": "./assets/adaptive-foreground-dark.png",
+        "darkForegroundImage": "./assets/adaptive-foreground-dark.png",
+        "darkBackgroundColor": "#070A14"
+      },
+      "package": "com.tunergtr.tuner",
+      "permissions": [
+        "RECORD_AUDIO",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon-dark.png",
+      "userInterfaceStyle": "dark"
+    },
+    "splash": {
+      "image": "./assets/splash-dark.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#070A14",
+      "dark": {
+        "image": "./assets/splash-dark.png",
+        "backgroundColor": "#070A14"
+      }
+    },
+    "ios": {
+      "bundleIdentifier": "com.tunergtr.tuner"
+    }
+  }
+}

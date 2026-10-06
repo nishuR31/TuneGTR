@@ -1,0 +1,23 @@
+{
+  "name": "tunergtr-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "TuneGTR guitar tuner monorepo",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "bun run start --workspace=mobile",
+    "start": "bun run start --workspace=mobile",
+    "android": "bun run android --workspace=mobile",
+    "prebuild": "cd apps/mobile && bunx expo prebuild",
+    "prebuild:android": "cd apps/mobile && bunx expo prebuild --platform android",
+    "test": "bun test",
+    "typecheck": "cd apps/mobile && bunx tsc --noEmit"
+  },
+  "dependencies": {
+    "expo-asset": "^57.0.18",
+    "react-native-css-interop": "^0.2.7"
+  }
+}
