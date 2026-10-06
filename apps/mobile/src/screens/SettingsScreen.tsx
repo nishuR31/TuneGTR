@@ -61,7 +61,7 @@ export function SettingsScreen() {
         </View>
 
         {/* Tuning Configuration */}
-        <AppText variant="caption" color="muted" style={styles.section}>
+        <AppText variant="caption" color="secondary" style={styles.section}>
           TUNING
         </AppText>
         <AppSurface isCard level="raised" style={styles.card}>
@@ -108,7 +108,7 @@ export function SettingsScreen() {
                   style={{
                     fontSize: 11,
                     fontWeight: f === capo ? '800' : '600',
-                    color: f === capo ? theme.colors.accent : theme.colors.textMuted,
+                    color: f === capo ? theme.colors.accent : theme.colors.textSecondary,
                   }}
                 >
                   {f === 0 ? 'OFF' : f}
@@ -119,7 +119,7 @@ export function SettingsScreen() {
         </AppSurface>
 
         {/* Haptics & Feedback */}
-        <AppText variant="caption" color="muted" style={styles.section}>
+        <AppText variant="caption" color="secondary" style={styles.section}>
           FEEDBACK
         </AppText>
         <AppSurface isCard style={styles.card}>
@@ -142,7 +142,7 @@ export function SettingsScreen() {
         {/* Developer & Tester Mode */}
         {isTesterModeUnlocked && (
           <>
-            <AppText variant="caption" color="muted" style={styles.section}>
+            <AppText variant="caption" color="secondary" style={styles.section}>
               DEVELOPER & TESTER
             </AppText>
             <AppSurface isCard style={styles.card}>
@@ -189,7 +189,7 @@ export function SettingsScreen() {
         )}
 
         {/* About & Privacy */}
-        <AppText variant="caption" color="muted" style={styles.section}>
+        <AppText variant="caption" color="secondary" style={styles.section}>
           ABOUT
         </AppText>
         <AppSurface isCard style={styles.card}>

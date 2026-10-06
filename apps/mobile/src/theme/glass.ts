@@ -34,11 +34,11 @@ export const glassDarkColors: ThemeColors = {
   surfaceRaised: "rgba(28, 37, 60, 0.85)",
   
   text: "#FFFFFF",
-  textSecondary: "#E2E8F0",
-  textMuted: "#818CF8",
+  textSecondary: "#CBD5E1", // High contrast light slate
+  textMuted: "#94A3B8",     // Crisp readable slate grey
   
   accent: "#6366F1", // Vibrant Indigo
-  accentSoft: "rgba(99, 102, 241, 0.20)",
+  accentSoft: "rgba(99, 102, 241, 0.25)",
   success: "#10B981", // Emerald Green
   successSoft: "rgba(16, 185, 129, 0.20)",
   warning: "#F59E0B", // Warm Amber
@@ -46,8 +46,8 @@ export const glassDarkColors: ThemeColors = {
   error: "#EF4444", // Crimson Rose
   errorSoft: "rgba(239, 68, 68, 0.20)",
   
-  border: "rgba(255, 255, 255, 0.16)",
-  highlight: "rgba(255, 255, 255, 0.20)",
+  border: "rgba(255, 255, 255, 0.18)",
+  highlight: "rgba(255, 255, 255, 0.22)",
 };
 
 // Light mode glass

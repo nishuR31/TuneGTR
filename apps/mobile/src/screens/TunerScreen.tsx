@@ -77,7 +77,7 @@ export function TunerScreen() {
       if (!isTesterModeUnlocked) {
         setTesterModeUnlocked(true);
         if (Platform.OS !== 'web') {
-          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => { });
         }
         toast.success('Tester Mode Activated', {
           description: 'Monitor is now available in the bottom navigation.',
@@ -93,10 +93,10 @@ export function TunerScreen() {
     state === 'in_tune'
       ? theme.colors.success
       : state === 'flat'
-      ? theme.colors.warning
-      : state === 'sharp'
-      ? theme.colors.error
-      : theme.colors.accent;
+        ? theme.colors.warning
+        : state === 'sharp'
+          ? theme.colors.error
+          : theme.colors.accent;
   const [label, sub] = stateCopy[state] ?? stateCopy.no_signal;
 
   const buttonScale = useSharedValue(1);
@@ -153,7 +153,7 @@ export function TunerScreen() {
                   </View>
                 )}
               </View>
-              <Text style={[styles.brandSub, { color: theme.colors.textMuted }]}>GUITAR TUNER · E A D G B E · A440</Text>
+              <Text style={[styles.brandSub, { color: theme.colors.textMuted }]}>GUITAR TUNER</Text>
               {testerTapCount > 0 && testerTapCount < 7 && !isTesterModeUnlocked && (
                 <View style={[styles.tapBadge, { borderColor: theme.colors.accent, backgroundColor: theme.colors.accentSoft }]}>
                   <AppText style={{ color: theme.colors.accent, fontSize: 10, fontWeight: '900' }}>
