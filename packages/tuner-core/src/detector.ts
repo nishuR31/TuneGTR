@@ -228,6 +228,35 @@ export class YinDetector implements PitchDetector {
 
     let selected = candidates[0];
 
+    /*
+     * Pure tones and weak fundamentals can make a subharmonic valley the
+     * strongest YIN minimum. Promote a genuine higher harmonic candidate when
+     * its spectral support is clearly stronger than the selected subharmonic.
+     */
+    for (const candidate of candidates) {
+      if (candidate.frequency <= selected.frequency) continue;
+      const ratio = candidate.frequency / selected.frequency;
+      const nearestInt = Math.round(ratio);
+      if (nearestInt < 2 || nearestInt > 5) continue;
+      if (Math.abs(ratio - nearestInt) > 0.03) continue;
+
+      const selectedMagnitude = this.goertzelMagnitude(
+        samples,
+        selected.frequency,
+        sampleRate,
+      );
+      const candidateMagnitude = this.goertzelMagnitude(
+        samples,
+        candidate.frequency,
+        sampleRate,
+      );
+
+      if (candidateMagnitude > selectedMagnitude * 4) {
+        selected = candidate;
+        break;
+      }
+    }
+
     if (targetFrequencies.length > 0) {
       /*
        * Guitar auto-detection rule:

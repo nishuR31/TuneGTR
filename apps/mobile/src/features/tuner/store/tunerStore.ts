@@ -252,7 +252,7 @@ export const useTunerStore = create<TunerStoreState>()(
       clearTestedStrings: () => set({ testedStrings: {} }),
     }),
     {
-      name: "TuneGTR",
+      name: "tunergtr-guitar-settings-v2",
       storage: createJSONStorage(() => AsyncStorage),
       partialize: (state) => ({
         capoFret: state.capoFret,

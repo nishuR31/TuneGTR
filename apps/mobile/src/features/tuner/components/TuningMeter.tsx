@@ -42,7 +42,7 @@ export const TuningMeter: React.FC = React.memo(() => {
         <AppText variant="caption" color="muted">SHARP</AppText>
       </View>
       <View style={[styles.track, { backgroundColor: theme.colors.surfaceRaised, borderColor: theme.colors.border }]}>
-        <View style={[styles.zone, { left: '43%', width: '14%', backgroundColor: theme.colors.successSoft }]} />
+        <View style={[styles.zone, { left: '45%', width: '10%', backgroundColor: theme.colors.successSoft }]} />
         <View style={[styles.center, { backgroundColor: theme.colors.success }]} />
         <Animated.View style={[styles.marker, { backgroundColor: color, shadowColor: color }, marker]} />
       </View>

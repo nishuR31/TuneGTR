@@ -30,3 +30,11 @@ This repository is structured as a **Monorepo** using Bun workspaces:
 - **Animations:** React Native Reanimated, React Native SVG
 - **State Management:** Zustand
 - **Pitch Detection:** YIN Algorithm (implemented in standard TypeScript / Float32Array)
+
+## Recent fixes
+
+- Pitch detector now promotes genuine harmonic candidates over weak subharmonics, fixing pure-tone misclassification (e.g. B3/E4).
+- Persisted tuner settings key changed to invalidate stale calibration data.
+- Dark-theme text contrast improved.
+- Tuning meter in-tune zone aligned to ±5 cents.
+- Added regression coverage for pure and detuned guitar tones.

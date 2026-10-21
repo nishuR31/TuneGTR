@@ -153,7 +153,7 @@ export function TunerScreen() {
                   </View>
                 )}
               </View>
-              <Text style={[styles.brandSub, { color: theme.colors.textMuted }]}>GUITAR TUNER</Text>
+              <Text style={[styles.brandSub, { color: theme.colors.textMuted }]}>GUITAR TUNER · E A D G B E · A440</Text>
               {testerTapCount > 0 && testerTapCount < 7 && !isTesterModeUnlocked && (
                 <View style={[styles.tapBadge, { borderColor: theme.colors.accent, backgroundColor: theme.colors.accentSoft }]}>
                   <AppText style={{ color: theme.colors.accent, fontSize: 10, fontWeight: '900' }}>

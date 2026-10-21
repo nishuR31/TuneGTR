@@ -34,8 +34,8 @@ export const glassDarkColors: ThemeColors = {
   surfaceRaised: "rgba(28, 37, 60, 0.85)",
   
   text: "#FFFFFF",
-  textSecondary: "#CBD5E1", // High contrast light slate
-  textMuted: "#94A3B8",     // Crisp readable slate grey
+  textSecondary: "#E2E8F0", // High contrast light slate
+  textMuted: "#B8C4D6",     // Crisp readable slate grey
   
   accent: "#6366F1", // Vibrant Indigo
   accentSoft: "rgba(99, 102, 241, 0.25)",

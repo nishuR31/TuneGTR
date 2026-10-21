@@ -50,3 +50,10 @@
 ## Important acoustic limitation
 
 A microphone cannot always prove the physical identity of a pitch. For example, a strong B3 partial can coexist with a low E string's third harmonic at approximately the same frequency. TuneGTR therefore prefers a credible direct configured string and provides explicit string locking for ambiguous cases instead of claiming certainty the audio cannot support.
+
+## Post-fix verification
+
+- `bun test`: 22/22 passing.
+- `bun run typecheck`: passing.
+- Android prebuild: successful.
+- Detector verified on pure tones and detuned guitar tones (-40..+40 cents).
