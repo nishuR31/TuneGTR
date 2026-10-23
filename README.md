@@ -38,3 +38,17 @@ This repository is structured as a **Monorepo** using Bun workspaces:
 - Dark-theme text contrast improved.
 - Tuning meter in-tune zone aligned to ±5 cents.
 - Added regression coverage for pure and detuned guitar tones.
+
+## Star History
+
+<a href="https://www.star-history.com/?repos=nishur31%2Ftunegtr&type=timeline&legend=top-left">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=nishur31/tunegtr&type=timeline&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=nishur31/tunegtr&type=timeline&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=nishur31/tunegtr&type=timeline&legend=top-left" />
+ </picture>
+</a>
+
+## Download 
+
+[Click to Download](https://github.com/nishuR31/TuneGTR/releases/download/Initial/TuneGTR.apk)
